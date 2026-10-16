@@ -1,57 +1,51 @@
-# Dữ liệu CSDL — Hệ thống Đăng ký học phần
+# Cơ sở dữ liệu QLDT
 
-Thư mục này chứa cấu trúc cơ sở dữ liệu và một bộ dữ liệu mẫu để team bắt đầu code.
-Dữ liệu mẫu sinh đúng theo *Tài liệu thiết kế phần mềm v1.0* (mục 3) và
-*Quy ước API và JSON v1.0* (mục 3.2).
+Cấu trúc CSDL và dữ liệu mẫu cho hệ thống Quản lý & Đăng ký Học phần Trực tuyến.
+Thiết kế theo *Tài liệu thiết kế phần mềm v1.0* (mục 3) và *Quy ước API và JSON v1.0* (mục 3.2).
 
 ## Cách nạp
 
-Cần **MySQL 8.0.16 trở lên** (bản cũ hơn không chạy được ràng buộc `CHECK` mà bảng
-`COURSE_SECTIONS` dùng tới).
+Yêu cầu MySQL 8.0.16 trở lên.
 
 ```bash
 mysql -u root -p < schema.sql
 mysql -u root -p < seed.sql
 ```
 
-Sau đó có database tên `qldt`. Chạy `seed.sql` bao nhiêu lần cũng được — file tự xóa
-dữ liệu cũ trước khi nạp.
+Sau khi chạy sẽ có database `qldt`. `seed.sql` xóa dữ liệu cũ trước khi nạp nên có thể chạy lại nhiều lần.
 
-## Đăng nhập thử
+## Tài khoản thử
 
-Mọi tài khoản dùng chung mật khẩu: **`123456`**
+Tất cả tài khoản dùng chung mật khẩu `123456`.
 
-| Ai | Tài khoản | Mã riêng |
+| Vai trò | Tên đăng nhập | Mã riêng |
 |---|---|---|
-| Ban quản lý | `admin`, `admin02` | — |
-| Giảng viên | `gv001` … `gv010` | `GV001` … `GV010` |
-| Sinh viên | `sv20210001` … `sv20211000` | `20210001` … `20211000` |
+| Quản trị | `admin`, `admin02` | không có |
+| Giảng viên | `gv001` đến `gv010` | `GV001` đến `GV010` |
+| Sinh viên | `sv20210001` đến `sv20211000` | `20210001` đến `20211000` |
 
-Tên đăng nhập của sinh viên chính là chữ `sv` cộng với mã số sinh viên, nên nhìn
-tài khoản là biết mã. Mật khẩu được lưu dạng băm bcrypt, khớp với `BCryptPasswordEncoder`
-của Spring — đăng nhập thật được chứ không phải dữ liệu giả.
+Tên đăng nhập của sinh viên là `sv` cộng với mã số sinh viên.
 
-## Trong database có gì
+## Dữ liệu mẫu
 
-- **10 giảng viên**, 1000 **sinh viên** (toàn bộ thuộc khóa K66 — đây là khóa duy nhất
-  xuất hiện trong tài liệu, mục 7.6 của Quy ước API), **100 môn học**.
-- **3 học kỳ**: `2025.1`, `2025.2`, `2026.1`. Học kỳ `2026.1` là học kỳ hiện tại
-  (bắt đầu 07/09/2026) — khi code API `/api/semesters/current` thì `semester_id = 3`.
-- **30 phòng học**, **400 lớp học phần** chia đều cho 3 học kỳ.
-- Khoảng **12 nghìn** bản ghi đăng ký, mỗi sinh viên đăng ký 3–6 lớp mỗi học kỳ.
+| Bảng | Số bản ghi |
+|---|---|
+| `USERS` | 1012 (2 quản trị, 10 giảng viên, 1000 sinh viên) |
+| `LECTURERS` | 10 |
+| `STUDENTS` | 1000 (khóa K66) |
+| `SUBJECTS` | 100 |
+| `SEMESTERS` | 3 (`2025.1`, `2025.2`, `2026.1`) |
+| `ROOMS` | 30 |
+| `COURSE_SECTIONS` | 400, chia đều cho 3 học kỳ |
+| `REGISTRATIONS` | 11983, mỗi sinh viên 3 đến 6 lớp mỗi học kỳ |
 
-Mỗi giảng viên phụ trách lớp ở cả 3 học kỳ, nên màn hình "lịch dạy" của giảng viên
-(UC008) có dữ liệu ngay.
+Học kỳ hiện tại là `2026.1` (bắt đầu 07/09/2026), tương ứng `semester_id = 3`.
+Mỗi giảng viên có lớp ở cả 3 học kỳ.
 
-## 8 bảng nói gì
+## Các bảng
 
-`USERS` giữ tài khoản đăng nhập của cả ba vai trò. `STUDENTS` và `LECTURERS` giữ hồ sơ
-riêng, mỗi hồ sơ gắn với đúng một tài khoản. `COURSE_SECTIONS` là bảng trung tâm —
-nối môn học với học kỳ, giảng viên và phòng học. `REGISTRATIONS` nối sinh viên với lớp
-học phần.
-
-Ba bảng còn lại (`SUBJECTS`, `SEMESTERS`, `ROOMS`) là danh mục, không có liên kết với nhau.
-
-Khi đọc tài liệu thiết kế, tên cột trong CSDL là `snake_case` (`student_code`) nhưng
-tên trường trả về cho front-end là `camelCase` (`studentCode`). Bảng đối chiếu nằm ở
-mục 3.2 của Quy ước API — đây là chỗ dễ sai nhất khi code, nên đọc lại trước khi map entity.
+- `USERS`: tài khoản đăng nhập của cả ba vai trò (ADMIN, LECTURER, STUDENT).
+- `STUDENTS`, `LECTURERS`: hồ sơ riêng, liên kết 1-1 với `USERS`.
+- `COURSE_SECTIONS`: bảng trung tâm, liên kết `SUBJECTS`, `SEMESTERS`, `ROOMS` và `LECTURERS`.
+- `REGISTRATIONS`: liên kết nhiều-nhiều giữa `STUDENTS` và `COURSE_SECTIONS`.
+- `SUBJECTS`, `SEMESTERS`, `ROOMS`: các bảng danh mục.
