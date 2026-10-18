@@ -49,7 +49,7 @@ jobs:
       DATABASE_URL: mysql+pymysql://app:app@127.0.0.1:3306/qldt?charset=utf8mb4
       JWT_SECRET: ci-only-secret-ci-only-secret-ci-only-1234
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v7
         with:
@@ -84,7 +84,7 @@ jobs:
     needs: backend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build image và khởi động database
         run: |
@@ -120,7 +120,7 @@ jobs:
       matrix:
         service: [backend, gateway]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Tên image (GHCR yêu cầu chữ thường)
         run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/${{ matrix.service }}" >> "$GITHUB_ENV"
@@ -162,7 +162,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Tính tên image và tag (khớp type=sha của bước publish, dạng sha-7 ký tự)"
         run: |
