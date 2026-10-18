@@ -1,6 +1,6 @@
 # Database Design Summary
 
-The current SQL source has been moved to `db/schema.sql` and `db/seed/seed.sql` without changing its contents. See `db/README.md` for setup instructions.
+The canonical SQL source is `db/schema.sql` and `db/seed/seed.sql`. The API's Alembic migration under `backend/migrations/` mirrors the SQL schema; keep its table names and constraints aligned. See `db/README.md` for setup instructions.
 
 Tables: `USERS`, `STUDENTS`, `LECTURERS`, `SUBJECTS`, `SEMESTERS`, `ROOMS`, `COURSE_SECTIONS`, `REGISTRATIONS`. All foreign keys use `ON DELETE RESTRICT`. Exact API field mapping belongs in `docs/naming-map.md` and must be verified against `contracts/openapi.yaml`.
 

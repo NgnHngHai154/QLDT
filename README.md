@@ -1,8 +1,8 @@
 # QLDT | Quản lý & Đăng ký Học phần Trực tuyến
 
-Đồ án IT3180 của Nhóm 20, Trường CNTT&TT, Đại học Bách khoa Hà Nội.
+Bài tập lớn IT3180 của Nhóm 20, Trường CNTT&TT, Đại học Bách khoa Hà Nội.
 
-## Bắt đầu với frontend
+## Frontend
 
 Yêu cầu Node.js 20 trở lên và npm.
 
@@ -13,42 +13,67 @@ npm run dev
 ```
 
 Mở URL Vite hiển thị trong terminal. Kiểm tra production build bằng `npm run build`.
-
 Tạo `frontend/.env.local` nếu cần đổi API origin:
 
 ```dotenv
 VITE_API_BASE_URL=/api
 ```
 
-Auth endpoint hiện dùng `POST /api/auth/login` và response `accessToken`; xác nhận field chi tiết với `contracts/openapi.yaml` trước khi tích hợp. Không dùng tài khoản demo giả trong UI.
+## Backend API
 
-## Chạy backend Sanic
+Yêu cầu Python 3.12 trở lên và MySQL 8.0.16 trở lên. Từ thư mục gốc, khởi động MySQL:
+
+```powershell
+docker compose up -d db
+```
+
+Sau đó cài và khởi động API:
 
 ```powershell
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
-pip install -e .
-$env:JWT_SECRET_KEY = (python -c "import secrets; print(secrets.token_urlsafe(48))")
-$env:DB_HOST = "localhost"
-$env:DB_NAME = "qldt"
-$env:DB_USER = "root"
-$env:DB_PASSWORD = "<local-password>"
-python run.py
+Copy-Item .env.example .env
+alembic upgrade head
+python -m scripts.seed
+uvicorn app.main:app --reload
 ```
 
-Use the single seeded admin account `admin` / `admin` for local auth checks; change it outside development. Lecturer and student sample accounts use `123456`.
+API docs: `http://localhost:8000/api/docs`; health: `http://localhost:8000/health`.
+Chỉnh `backend/.env` để thay `DATABASE_URL` và `JWT_SECRET`; không dùng secret mặc định ở production.
+Kiểm thử bằng `pytest` và `ruff check .` từ thư mục `backend/`.
 
-## Bản đồ repository
+Một số service catalog, registration và timetable vẫn là khung trả `501 NOT_IMPLEMENTED`;
+xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
 
-- `docs/00-INDEX.md`: nơi bắt đầu và bản đồ tài liệu.
-- `contracts/`: hợp đồng API; OpenAPI cần được bổ sung bởi nhóm backend.
-- `frontend/`: ứng dụng React + TypeScript + Vite.
-- `backend/`: Sanic API with `src/qldt/{auth,security,common}` in place; other business packages are ready for implementation.
-- `db/`, `e2e/`, `tasks/`, `scripts/`: project data and member work areas.
-- `db/`: schema, seed và vùng migrations dành cho thành viên DB.
+## Toàn bộ stack Docker
+
+Từ thư mục gốc:
+
+```powershell
+docker compose up -d --build db
+docker compose run --rm backend alembic upgrade head
+docker compose run --rm backend python -m scripts.seed
+docker compose up -d --build backend gateway
+```
+
+Gateway: `http://localhost:8080`; Swagger UI: `http://localhost:8080/api/docs`.
+Deployment production và các secret được mô tả trong [docker-compose.prod.yml](docker-compose.prod.yml)
+và workflow [CI/CD](.github/workflows/ci-cd.yml). Deploy qua SSH được tắt mặc định.
+
+## Cấu trúc repository
+
+- [docs/00-INDEX.md](docs/00-INDEX.md): bản đồ và nguồn tài liệu dự án.
+- `contracts/`: hợp đồng API; `contracts/openapi.yaml` chưa được cung cấp.
+- `backend/`: FastAPI, SQLAlchemy, Alembic, tests và seed tiện ích dev.
+- `frontend/`: React + TypeScript + Vite.
+- `db/`: SQL schema và seed chuẩn; tên database `qldt`.
+- `gateway/`: reverse proxy Nginx và smoke test.
+- `docker-compose.yml`, `docker-compose.prod.yml`: cấu hình local và production.
+- `.github/workflows/ci-cd.yml`: lint, tests, migration checks, container integration, image publish; deployment SSH tùy chọn.
+- `e2e/`, `tasks/`, `scripts/`: vùng test/workflow và theo dõi công việc.
 
 ## Trạng thái
 
-Frontend có shell theo role, đăng nhập, đăng ký/hủy lớp, thời khóa biểu tuần và các trang tra cứu theo role. Build đã qua; luồng chính được smoke-test với mock trên browser. CRUD, chi tiết roster và API thật còn chờ `contracts/openapi.yaml`. Xem `tasks/BOARD.md`.
+Tiến độ, phần còn thiếu và trạng thái kiểm thử được theo dõi tại [tasks/BOARD.md](tasks/BOARD.md).

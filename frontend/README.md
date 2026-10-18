@@ -16,7 +16,6 @@ Set `VITE_API_BASE_URL` in `.env.local` if the backend is not served from the sa
 - `src/app`: router and application layout.
 - `src/modules`: auth, catalog, registration, and timetable features.
 - `src/shared`: API client and shared UI/hooks/utilities.
-- `src/mocks`: reserved for contract-generated mocks.
 
 ## Contract note
 
