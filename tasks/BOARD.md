@@ -7,7 +7,7 @@
 | FE UC003/UC009 | Frontend | Roster count UI; backend roster service returns 501 and detail fields are pending | Implement roster service; OpenAPI schema and pagination |
 | FE UC005 | Frontend | Registration UI and browser mock smoke passed; backend registration service returns 501 | Implement service and verify against OpenAPI/backend |
 | FE UC006 | Frontend | Cancel UI and browser mock smoke passed; backend registration service returns 501 | Implement service; change-class atomic API/UX decision |
-| FE UC007/UC008 | Frontend | Weekly grid and mock render passed; backend timetable service returns 501 | Implement timetable service; verify response/period boundaries |
+| FE UC007/UC008 | Frontend | In Progress — weekly grid and Admin schedule/room/lecturer assignment UI implemented with local conflict checks; backend timetable service returns 501 | Implement timetable service; verify response/period boundaries |
 | BE Auth / UC001 | Backend | FastAPI auth implemented; 13 tests pass with SQLite fixtures | Verify against reviewed OpenAPI and real MySQL |
 | BE catalog/registration/timetable | Backend | Routes, DTOs, repositories, and migration scaffold integrated; service operations return `501 NOT_IMPLEMENTED` | Implement business services and focused tests |
 | API/OpenAPI | Backend | Generated FastAPI docs available at `/api/openapi.json`; reviewed contract not supplied | Publish `contracts/openapi.yaml`; reconcile schemas |
