@@ -4,7 +4,8 @@ from app.core.config import settings
 from app.core.error_codes import ErrorCode
 from app.core.exceptions import AppError, field_error
 from app.dto.common import ItemList
-from app.dto.registration.registration import RegisterRequest, Registration
+from app.dto.registration.registration import RegisterRequest
+from app.dto.registration.registration import Registration as RegistrationDto
 from app.entity.auth.user import User
 from app.entity.registration.registration import Registration as RegistrationEntity
 from app.repository.auth.user_repository import StudentRepository
@@ -22,14 +23,17 @@ class RegistrationService:
         self.sections = SectionRepository(db)
         self.registrations = RegistrationRepository(db)
 
-    def register(self, user: User, request: RegisterRequest) -> Registration:
+    def register(self, user: User, request: RegisterRequest) -> RegistrationDto:
         student = self.students.get_by_user_id_for_update(user.id)
         if student is None:
-            raise AppError(ErrorCode.NOT_FOUND)
+            raise AppError(ErrorCode.FORBIDDEN)
 
         section = self.sections.get_by_id(request.section_id)
         if section is None:
-            raise AppError(ErrorCode.NOT_FOUND)
+            raise AppError(
+                ErrorCode.NOT_FOUND,
+                details=[field_error("sectionId", "Lớp học phần không tồn tại")],
+            )
 
         if self.registrations.exists(student.id, section.id):
             raise AppError(ErrorCode.ALREADY_REGISTERED)
@@ -68,15 +72,15 @@ class RegistrationService:
             RegistrationEntity(student_id=student.id, section_id=section.id)
         )
         self.db.commit()
-        self.db.refresh(section)
-        result = Registration.model_validate(registration)
+        loaded_registration = self.registrations.get_by_id(registration.id)
+        result = RegistrationDto.model_validate(loaded_registration)
         result.section.registered_by_me = True
         return result
 
     def cancel(self, user: User, registration_id: int) -> None:
         student = self.students.get_by_user_id_for_update(user.id)
         if student is None:
-            raise AppError(ErrorCode.NOT_FOUND)
+            raise AppError(ErrorCode.FORBIDDEN)
 
         registration = self.registrations.get_by_id(registration_id)
         if registration is None:
@@ -84,7 +88,7 @@ class RegistrationService:
         if registration.student_id != student.id:
             raise AppError(ErrorCode.FORBIDDEN)
 
-        section = self.sections.get_by_id(registration.section_id)
+        section = registration.section
         if section is None:
             raise AppError(ErrorCode.NOT_FOUND)
 
@@ -108,13 +112,15 @@ class RegistrationService:
         self.sections.decrement_enrollment(section.id)
         self.db.commit()
 
-    def list_mine(self, user: User, semester_id: int) -> ItemList[Registration]:
+    def list_mine(self, user: User, semester_id: int) -> ItemList[RegistrationDto]:
         student = self.students.get_by_user_id(user.id)
         if student is None:
-            raise AppError(ErrorCode.NOT_FOUND)
-        items = []
-        for item in self.registrations.list_by_student(student.id, semester_id):
-            registration = Registration.model_validate(item)
-            registration.section.registered_by_me = True
-            items.append(registration)
-        return ItemList(items=items)
+            return ItemList[RegistrationDto](items=[])
+
+        registrations = self.registrations.list_by_student(student.id, semester_id)
+        items: list[RegistrationDto] = []
+        for registration in registrations:
+            dto = RegistrationDto.model_validate(registration)
+            dto.section.registered_by_me = True
+            items.append(dto)
+        return ItemList[RegistrationDto](items=items)

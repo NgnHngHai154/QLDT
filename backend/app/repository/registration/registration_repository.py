@@ -1,6 +1,8 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
+from app.entity.auth.lecturer import Lecturer
+from app.entity.auth.student import Student
 from app.entity.catalog.course_section import CourseSection
 from app.entity.catalog.subject import Subject
 from app.entity.registration.registration import Registration
@@ -9,7 +11,20 @@ from app.repository.base import BaseRepository
 
 class RegistrationRepository(BaseRepository):
     def get_by_id(self, registration_id: int) -> Registration | None:
-        return self.db.get(Registration, registration_id)
+        stmt = (
+            select(Registration)
+            .options(
+                joinedload(Registration.section).joinedload(CourseSection.subject),
+                joinedload(Registration.section).joinedload(CourseSection.semester),
+                joinedload(Registration.section)
+                .joinedload(CourseSection.lecturer)
+                .joinedload(Lecturer.user),
+                joinedload(Registration.section).joinedload(CourseSection.room),
+                joinedload(Registration.student),
+            )
+            .where(Registration.id == registration_id)
+        )
+        return self.db.scalars(stmt).first()
 
     def add(self, registration: Registration) -> Registration:
         self.db.add(registration)
@@ -78,19 +93,45 @@ class RegistrationRepository(BaseRepository):
         stmt = (
             select(Registration)
             .join(CourseSection, Registration.section_id == CourseSection.id)
+            .options(
+                joinedload(Registration.section).joinedload(CourseSection.subject),
+                joinedload(Registration.section).joinedload(CourseSection.semester),
+                joinedload(Registration.section)
+                .joinedload(CourseSection.lecturer)
+                .joinedload(Lecturer.user),
+                joinedload(Registration.section).joinedload(CourseSection.room),
+            )
             .where(
                 Registration.student_id == student_id,
                 CourseSection.semester_id == semester_id,
             )
-            .options(
-                joinedload(Registration.section).joinedload(CourseSection.subject),
-                joinedload(Registration.section).joinedload(CourseSection.semester),
-                joinedload(Registration.section).joinedload(CourseSection.lecturer),
-                joinedload(Registration.section).joinedload(CourseSection.room),
+            .order_by(
+                CourseSection.day_of_week.asc(),
+                CourseSection.start_period.asc(),
+                Registration.registered_at.asc(),
+                Registration.id.asc(),
             )
-            .order_by(Registration.registered_at, Registration.id)
         )
         return list(self.db.scalars(stmt).all())
 
     def list_students_of_section(self, section_id: int) -> list[Registration]:
-        raise NotImplementedError  # TODO: kèm Student + User để lấy họ tên, email
+        stmt = (
+            select(Registration)
+            .options(
+                joinedload(Registration.student).joinedload(Student.user),
+            )
+            .where(Registration.section_id == section_id)
+            .order_by(Registration.registered_at.asc())
+        )
+        return list(self.db.scalars(stmt).all())
+
+    def registered_section_ids_for_student(self, student_id: int, semester_id: int) -> set[int]:
+        stmt = (
+            select(Registration.section_id)
+            .join(CourseSection, Registration.section_id == CourseSection.id)
+            .where(
+                Registration.student_id == student_id,
+                CourseSection.semester_id == semester_id,
+            )
+        )
+        return set(self.db.scalars(stmt).all())

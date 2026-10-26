@@ -10,6 +10,6 @@
 - Registration/cancellation lock the student's row with `SELECT ... FOR UPDATE` before checking credit and schedule rules. Credit totals sum `SUBJECTS.credits` for registrations in the semester; prerequisite and co-requisite checks are out of scope.
 - All API routes use `/api`; JSON keys are camelCase and errors use the shared FE-BE envelope. Auth returns `accessToken` and a nested `user` object for FE compatibility.
 - Business modules belong in `app/{controller,service,repository,entity,dto}/{auth,catalog,registration,timetable}`; shared configuration and errors belong in `app/core/`, and authentication helpers belong in `app/security/`.
-- Catalog and timetable services that still raise `NotImplementedError` return `501 NOT_IMPLEMENTED`. Registration, cancellation, and list-mine are implemented and have SQLite-backed tests. Compose startup and MySQL migration were verified, but registration rules and concurrent MySQL row locking still need dedicated verification.
+- Catalog, registration, and timetable business services for UC002-UC009 are implemented. Registration and cancellation enforce semester credit limits and lock the student's row; catalog and timetable behavior has automated coverage.
 - Run `ruff check .`, `pytest`, `alembic upgrade head`, and `alembic check` from `backend/`. CI also builds and smoke-tests the Compose gateway stack.
-- Keep `contracts/openapi.yaml` synchronized with backend routes when the reviewed FE-BE contract is added; generated FastAPI docs are not its replacement.
+- `contracts/openapi.yaml` and `contracts/api-types.ts` are synchronized with backend routes and schemas.

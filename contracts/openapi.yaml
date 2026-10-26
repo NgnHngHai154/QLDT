@@ -1,0 +1,2224 @@
+openapi: 3.1.0
+info:
+  title: Hệ thống Quản lý & Đăng ký Học phần
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      tags:
+      - auth
+      summary: Đăng nhập (UC001)
+      operationId: login_api_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/auth/me:
+    get:
+      tags:
+      - auth
+      summary: Thông tin người dùng hiện tại
+      operationId: me_api_auth_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - HTTPBearer: []
+  /api/auth/logout:
+    post:
+      tags:
+      - auth
+      summary: Đăng xuất
+      operationId: logout_api_auth_logout_post
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - HTTPBearer: []
+  /api/semesters:
+    get:
+      tags:
+      - catalog
+      summary: Danh sách học kỳ
+      operationId: list_semesters_api_semesters_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemList_Semester_'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - HTTPBearer: []
+  /api/semesters/current:
+    get:
+      tags:
+      - catalog
+      summary: Học kỳ hiện tại và tuần hiện tại
+      operationId: current_semester_api_semesters_current_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentSemester'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - HTTPBearer: []
+  /api/subjects:
+    get:
+      tags:
+      - catalog
+      summary: Danh sách môn học
+      operationId: list_subjects_api_subjects_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: keyword
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Keyword
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Size
+      - name: sort
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: tenTruong,asc|desc
+          title: Sort
+        description: tenTruong,asc|desc
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Subject_'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - catalog
+      summary: Thêm môn học
+      operationId: create_subject_api_subjects_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectCreateRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/subjects/{subject_id}:
+    get:
+      tags:
+      - catalog
+      summary: Chi tiết môn học
+      operationId: get_subject_api_subjects__subject_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: subject_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Subject Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - catalog
+      summary: Sửa môn học
+      operationId: update_subject_api_subjects__subject_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: subject_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Subject Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - catalog
+      summary: Xóa môn học
+      operationId: delete_subject_api_subjects__subject_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: subject_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Subject Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/sections:
+    get:
+      tags:
+      - catalog
+      summary: Danh sách lớp học phần
+      operationId: list_sections_api_sections_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: semesterId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Semesterid
+      - name: subjectId
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Subjectid
+      - name: keyword
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Keyword
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Size
+      - name: sort
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: tenTruong,asc|desc
+          title: Sort
+        description: tenTruong,asc|desc
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Section_'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - catalog
+      summary: Thêm lớp học phần
+      operationId: create_section_api_sections_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SectionCreateRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Section'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/sections/lookups:
+    get:
+      tags:
+      - catalog
+      summary: Dữ liệu cho form lớp học phần
+      operationId: get_lookups_api_sections_lookups_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lookups'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - HTTPBearer: []
+  /api/sections/{section_id}:
+    get:
+      tags:
+      - catalog
+      summary: Chi tiết lớp học phần
+      operationId: get_section_api_sections__section_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Section Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Section'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - catalog
+      summary: Sửa lớp học phần
+      operationId: update_section_api_sections__section_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Section Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SectionUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Section'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - catalog
+      summary: Xóa lớp học phần
+      operationId: delete_section_api_sections__section_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Section Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/sections/{section_id}/students:
+    get:
+      tags:
+      - catalog
+      summary: Danh sách sinh viên của lớp (UC003, UC009)
+      operationId: list_section_students_api_sections__section_id__students_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Section Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SectionStudentList'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/registrations:
+    post:
+      tags:
+      - registration
+      summary: Đăng ký lớp học phần (UC005)
+      operationId: register_api_registrations_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/registrations/me:
+    get:
+      tags:
+      - registration
+      summary: Các lớp đã đăng ký của tôi
+      operationId: my_registrations_api_registrations_me_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: semesterId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Semesterid
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemList_Registration_'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/registrations/{registration_id}:
+    delete:
+      tags:
+      - registration
+      summary: Hủy đăng ký (UC006)
+      operationId: cancel_api_registrations__registration_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: registration_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Registration Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/students/me/timetable:
+    get:
+      tags:
+      - timetable
+      summary: Thời khóa biểu sinh viên (UC007)
+      operationId: student_timetable_api_students_me_timetable_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: semesterId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Semesterid
+      - name: week
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            minimum: 1
+          - type: 'null'
+          title: Week
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timetable'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/lecturers/me/timetable:
+    get:
+      tags:
+      - timetable
+      summary: Lịch dạy giảng viên (UC008)
+      operationId: lecturer_timetable_api_lecturers_me_timetable_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: semesterId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Semesterid
+      - name: week
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            minimum: 1
+          - type: 'null'
+          title: Week
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timetable'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/lecturers/me/sections:
+    get:
+      tags:
+      - timetable
+      summary: Các lớp được phân công
+      operationId: lecturer_sections_api_lecturers_me_sections_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: semesterId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Semesterid
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemList_Section_'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AuthResponse:
+      properties:
+        accessToken:
+          type: string
+          title: Accesstoken
+        tokenType:
+          type: string
+          title: Tokentype
+          default: Bearer
+        expiresIn:
+          type: integer
+          title: Expiresin
+        user:
+          $ref: '#/components/schemas/UserInfo'
+      type: object
+      required:
+      - accessToken
+      - expiresIn
+      - user
+      title: AuthResponse
+    CurrentSemester:
+      properties:
+        id:
+          type: integer
+          title: Id
+        semesterCode:
+          type: string
+          title: Semestercode
+        name:
+          type: string
+          title: Name
+        startDate:
+          type: string
+          format: date
+          title: Startdate
+        endDate:
+          type: string
+          format: date
+          title: Enddate
+        numWeeks:
+          type: integer
+          title: Numweeks
+        currentWeek:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Currentweek
+      type: object
+      required:
+      - id
+      - semesterCode
+      - name
+      - startDate
+      - endDate
+      - numWeeks
+      - currentWeek
+      title: CurrentSemester
+    CurrentUserResponse:
+      properties:
+        user:
+          $ref: '#/components/schemas/UserInfo'
+      type: object
+      required:
+      - user
+      title: CurrentUserResponse
+    ErrorResponse:
+      properties:
+        status:
+          type: integer
+          title: Status
+        error:
+          type: string
+          title: Error
+        message:
+          type: string
+          title: Message
+        details:
+          items:
+            $ref: '#/components/schemas/FieldError'
+          type: array
+          title: Details
+          default: []
+        path:
+          type: string
+          title: Path
+        timestamp:
+          type: string
+          title: Timestamp
+      type: object
+      required:
+      - status
+      - error
+      - message
+      - path
+      - timestamp
+      title: ErrorResponse
+    FieldError:
+      properties:
+        field:
+          type: string
+          title: Field
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - field
+      - message
+      title: FieldError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ItemList_Registration_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Registration'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ItemList[Registration]
+    ItemList_Section_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Section'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ItemList[Section]
+    ItemList_Semester_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Semester'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ItemList[Semester]
+    LecturerRef:
+      properties:
+        id:
+          type: integer
+          title: Id
+        lecturerCode:
+          type: string
+          title: Lecturercode
+        fullName:
+          type: string
+          title: Fullname
+      type: object
+      required:
+      - id
+      - lecturerCode
+      - fullName
+      title: LecturerRef
+    LoginRequest:
+      properties:
+        username:
+          type: string
+          maxLength: 50
+          minLength: 1
+          title: Username
+        password:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: LoginRequest
+    Lookups:
+      properties:
+        subjects:
+          items:
+            $ref: '#/components/schemas/SubjectRef'
+          type: array
+          title: Subjects
+        lecturers:
+          items:
+            $ref: '#/components/schemas/LecturerRef'
+          type: array
+          title: Lecturers
+        rooms:
+          items:
+            $ref: '#/components/schemas/RoomRef'
+          type: array
+          title: Rooms
+        semesters:
+          items:
+            $ref: '#/components/schemas/Semester'
+          type: array
+          title: Semesters
+      type: object
+      required:
+      - subjects
+      - lecturers
+      - rooms
+      - semesters
+      title: Lookups
+      description: Dữ liệu cho các ô chọn của form thêm / sửa lớp học phần.
+    Page_Section_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Section'
+          type: array
+          title: Items
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        totalItems:
+          type: integer
+          title: Totalitems
+        totalPages:
+          type: integer
+          title: Totalpages
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - totalItems
+      - totalPages
+      title: Page[Section]
+    Page_Subject_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Subject'
+          type: array
+          title: Items
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        totalItems:
+          type: integer
+          title: Totalitems
+        totalPages:
+          type: integer
+          title: Totalpages
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - totalItems
+      - totalPages
+      title: Page[Subject]
+    RegisterRequest:
+      properties:
+        sectionId:
+          type: integer
+          title: Sectionid
+      type: object
+      required:
+      - sectionId
+      title: RegisterRequest
+    Registration:
+      properties:
+        id:
+          type: integer
+          title: Id
+        registeredAt:
+          type: string
+          format: date-time
+          title: Registeredat
+        section:
+          $ref: '#/components/schemas/Section'
+      type: object
+      required:
+      - id
+      - registeredAt
+      - section
+      title: Registration
+    Role:
+      type: string
+      enum:
+      - ADMIN
+      - LECTURER
+      - STUDENT
+      title: Role
+    RoomRef:
+      properties:
+        id:
+          type: integer
+          title: Id
+        roomCode:
+          type: string
+          title: Roomcode
+        building:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Building
+        capacity:
+          type: integer
+          title: Capacity
+      type: object
+      required:
+      - id
+      - roomCode
+      - building
+      - capacity
+      title: RoomRef
+    Section:
+      properties:
+        id:
+          type: integer
+          title: Id
+        sectionCode:
+          type: string
+          title: Sectioncode
+        subject:
+          $ref: '#/components/schemas/SubjectRef'
+        semester:
+          $ref: '#/components/schemas/SemesterRef'
+        lecturer:
+          $ref: '#/components/schemas/LecturerRef'
+        room:
+          $ref: '#/components/schemas/RoomRef'
+        dayOfWeek:
+          type: integer
+          title: Dayofweek
+        startPeriod:
+          type: integer
+          title: Startperiod
+        endPeriod:
+          type: integer
+          title: Endperiod
+        startWeek:
+          type: integer
+          title: Startweek
+        endWeek:
+          type: integer
+          title: Endweek
+        maxCapacity:
+          type: integer
+          title: Maxcapacity
+        currentEnrollment:
+          type: integer
+          title: Currentenrollment
+        remainingSeats:
+          type: integer
+          title: Remainingseats
+        full:
+          type: boolean
+          title: Full
+        registeredByMe:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Registeredbyme
+      type: object
+      required:
+      - id
+      - sectionCode
+      - subject
+      - semester
+      - lecturer
+      - room
+      - dayOfWeek
+      - startPeriod
+      - endPeriod
+      - startWeek
+      - endWeek
+      - maxCapacity
+      - currentEnrollment
+      - remainingSeats
+      - full
+      title: Section
+    SectionCreateRequest:
+      properties:
+        subjectId:
+          type: integer
+          title: Subjectid
+        semesterId:
+          type: integer
+          title: Semesterid
+        lecturerId:
+          type: integer
+          title: Lecturerid
+        roomId:
+          type: integer
+          title: Roomid
+        dayOfWeek:
+          type: integer
+          maximum: 8.0
+          minimum: 2.0
+          title: Dayofweek
+        startPeriod:
+          type: integer
+          maximum: 12.0
+          minimum: 1.0
+          title: Startperiod
+        endPeriod:
+          type: integer
+          maximum: 12.0
+          minimum: 1.0
+          title: Endperiod
+        startWeek:
+          type: integer
+          minimum: 1.0
+          title: Startweek
+        endWeek:
+          type: integer
+          minimum: 1.0
+          title: Endweek
+        maxCapacity:
+          type: integer
+          minimum: 1.0
+          title: Maxcapacity
+        sectionCode:
+          type: string
+          maxLength: 20
+          minLength: 1
+          title: Sectioncode
+      type: object
+      required:
+      - subjectId
+      - semesterId
+      - lecturerId
+      - roomId
+      - dayOfWeek
+      - startPeriod
+      - endPeriod
+      - startWeek
+      - endWeek
+      - maxCapacity
+      - sectionCode
+      title: SectionCreateRequest
+    SectionStudent:
+      properties:
+        id:
+          type: integer
+          title: Id
+        studentCode:
+          type: string
+          title: Studentcode
+        fullName:
+          type: string
+          title: Fullname
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        cohort:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cohort
+        major:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Major
+        registeredAt:
+          type: string
+          format: date-time
+          title: Registeredat
+      type: object
+      required:
+      - id
+      - studentCode
+      - fullName
+      - email
+      - cohort
+      - major
+      - registeredAt
+      title: SectionStudent
+    SectionStudentList:
+      properties:
+        sectionId:
+          type: integer
+          title: Sectionid
+        sectionCode:
+          type: string
+          title: Sectioncode
+        currentEnrollment:
+          type: integer
+          title: Currentenrollment
+        maxCapacity:
+          type: integer
+          title: Maxcapacity
+        items:
+          items:
+            $ref: '#/components/schemas/SectionStudent'
+          type: array
+          title: Items
+      type: object
+      required:
+      - sectionId
+      - sectionCode
+      - currentEnrollment
+      - maxCapacity
+      - items
+      title: SectionStudentList
+    SectionUpdateRequest:
+      properties:
+        subjectId:
+          type: integer
+          title: Subjectid
+        semesterId:
+          type: integer
+          title: Semesterid
+        lecturerId:
+          type: integer
+          title: Lecturerid
+        roomId:
+          type: integer
+          title: Roomid
+        dayOfWeek:
+          type: integer
+          maximum: 8.0
+          minimum: 2.0
+          title: Dayofweek
+        startPeriod:
+          type: integer
+          maximum: 12.0
+          minimum: 1.0
+          title: Startperiod
+        endPeriod:
+          type: integer
+          maximum: 12.0
+          minimum: 1.0
+          title: Endperiod
+        startWeek:
+          type: integer
+          minimum: 1.0
+          title: Startweek
+        endWeek:
+          type: integer
+          minimum: 1.0
+          title: Endweek
+        maxCapacity:
+          type: integer
+          minimum: 1.0
+          title: Maxcapacity
+      type: object
+      required:
+      - subjectId
+      - semesterId
+      - lecturerId
+      - roomId
+      - dayOfWeek
+      - startPeriod
+      - endPeriod
+      - startWeek
+      - endWeek
+      - maxCapacity
+      title: SectionUpdateRequest
+      description: Không có sectionCode. Nếu lớp đã có đăng ký, subjectId và semesterId
+        phải giữ nguyên.
+    Semester:
+      properties:
+        id:
+          type: integer
+          title: Id
+        semesterCode:
+          type: string
+          title: Semestercode
+        name:
+          type: string
+          title: Name
+        startDate:
+          type: string
+          format: date
+          title: Startdate
+        endDate:
+          type: string
+          format: date
+          title: Enddate
+        numWeeks:
+          type: integer
+          title: Numweeks
+      type: object
+      required:
+      - id
+      - semesterCode
+      - name
+      - startDate
+      - endDate
+      - numWeeks
+      title: Semester
+    SemesterRef:
+      properties:
+        id:
+          type: integer
+          title: Id
+        semesterCode:
+          type: string
+          title: Semestercode
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - id
+      - semesterCode
+      - name
+      title: SemesterRef
+    Subject:
+      properties:
+        id:
+          type: integer
+          title: Id
+        subjectCode:
+          type: string
+          title: Subjectcode
+        name:
+          type: string
+          title: Name
+        credits:
+          type: integer
+          title: Credits
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        sectionCount:
+          type: integer
+          title: Sectioncount
+          default: 0
+      type: object
+      required:
+      - id
+      - subjectCode
+      - name
+      - credits
+      - description
+      title: Subject
+    SubjectCreateRequest:
+      properties:
+        subjectCode:
+          type: string
+          maxLength: 20
+          minLength: 1
+          title: Subjectcode
+        name:
+          type: string
+          maxLength: 150
+          minLength: 1
+          title: Name
+        credits:
+          type: integer
+          minimum: 1.0
+          title: Credits
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - subjectCode
+      - name
+      - credits
+      title: SubjectCreateRequest
+    SubjectRef:
+      properties:
+        id:
+          type: integer
+          title: Id
+        subjectCode:
+          type: string
+          title: Subjectcode
+        name:
+          type: string
+          title: Name
+        credits:
+          type: integer
+          title: Credits
+      type: object
+      required:
+      - id
+      - subjectCode
+      - name
+      - credits
+      title: SubjectRef
+    SubjectUpdateRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          minLength: 1
+          title: Name
+        credits:
+          type: integer
+          minimum: 1.0
+          title: Credits
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - name
+      - credits
+      title: SubjectUpdateRequest
+      description: 'Không có subjectCode: mã môn học không được sửa.'
+    Timetable:
+      properties:
+        semesterId:
+          type: integer
+          title: Semesterid
+        week:
+          type: integer
+          title: Week
+        weekStartDate:
+          type: string
+          format: date
+          title: Weekstartdate
+        weekEndDate:
+          type: string
+          format: date
+          title: Weekenddate
+        items:
+          items:
+            $ref: '#/components/schemas/TimetableItem'
+          type: array
+          title: Items
+      type: object
+      required:
+      - semesterId
+      - week
+      - weekStartDate
+      - weekEndDate
+      - items
+      title: Timetable
+    TimetableItem:
+      properties:
+        sectionId:
+          type: integer
+          title: Sectionid
+        sectionCode:
+          type: string
+          title: Sectioncode
+        subjectCode:
+          type: string
+          title: Subjectcode
+        subjectName:
+          type: string
+          title: Subjectname
+        dayOfWeek:
+          type: integer
+          title: Dayofweek
+        date:
+          type: string
+          format: date
+          title: Date
+        startPeriod:
+          type: integer
+          title: Startperiod
+        endPeriod:
+          type: integer
+          title: Endperiod
+        roomCode:
+          type: string
+          title: Roomcode
+        lecturerName:
+          type: string
+          title: Lecturername
+        startWeek:
+          type: integer
+          title: Startweek
+        endWeek:
+          type: integer
+          title: Endweek
+      type: object
+      required:
+      - sectionId
+      - sectionCode
+      - subjectCode
+      - subjectName
+      - dayOfWeek
+      - date
+      - startPeriod
+      - endPeriod
+      - roomCode
+      - lecturerName
+      - startWeek
+      - endWeek
+      title: TimetableItem
+    UserInfo:
+      properties:
+        userId:
+          type: integer
+          title: Userid
+        username:
+          type: string
+          title: Username
+        fullName:
+          type: string
+          title: Fullname
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        role:
+          $ref: '#/components/schemas/Role'
+        studentCode:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Studentcode
+        lecturerCode:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Lecturercode
+      type: object
+      required:
+      - userId
+      - username
+      - fullName
+      - email
+      - role
+      - studentCode
+      - lecturerCode
+      title: UserInfo
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
