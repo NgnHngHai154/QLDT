@@ -13,6 +13,8 @@ Branch on `error`; never use localized `message` as program logic. Do not expose
 | `ALREADY_REGISTERED` | 409 | Explain existing registration and refetch registration/sections. |
 | `SAME_SUBJECT_REGISTERED` | 409 | Explain subject already selected; refetch. |
 | `STUDENT_SCHEDULE_CONFLICT` | 409 | Explain schedule conflict; refetch; show conflicting section only if response details identify it. |
+| `CREDIT_LIMIT_EXCEEDED` | 409 | Explain the semester maximum and current credits from `details[]`; keep the registration and seat count unchanged. |
+| `CREDIT_LIMIT_BELOW_MIN` | 409 | Explain that cancellation would go below the minimum; keep the registration and seat count unchanged. |
 | `DUPLICATE_CODE` | 409 | Map field if `details[].field` is present; preserve other input. |
 | `SCHEDULE_CONFLICT` | 409 | Show backend details in section form; do not parse `message` for logic. |
 | `CAPACITY_BELOW_ENROLLMENT` | 409 | Keep edit form open and identify capacity field when details allow. |

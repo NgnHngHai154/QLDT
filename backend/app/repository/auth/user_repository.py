@@ -21,6 +21,10 @@ class StudentRepository(BaseRepository):
     def get_by_id(self, student_id: int) -> Student | None:
         return self.db.get(Student, student_id)
 
+    def get_by_user_id_for_update(self, user_id: int) -> Student | None:
+        stmt = select(Student).where(Student.user_id == user_id).with_for_update()
+        return self.db.scalars(stmt).first()
+
 
 class LecturerRepository(BaseRepository):
     def get_by_user_id(self, user_id: int) -> Lecturer | None:

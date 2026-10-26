@@ -18,13 +18,14 @@ Then, from this directory:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
-Copy-Item .env.example .env
 alembic upgrade head
 python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-The example `.env` targets the local Compose database `qldt` using its development-only `app` credentials. Set a unique `JWT_SECRET` of at least 32 characters outside local development.
+Configuration is read from the repository-root `.env` (and then this directory's optional `.env`)
+or process environment. Copy the root `.env.example` to `.env` and set both MySQL passwords plus
+a `JWT_SECRET` of at least 32 characters before running Compose or the API.
 
 - API docs: `http://localhost:8000/api/docs`
 - API OpenAPI JSON: `http://localhost:8000/api/openapi.json`
@@ -66,7 +67,14 @@ Keep dependencies flowing `controller → service → repository → entity`. Se
 
 Implemented and covered by tests: login, current user, logout, role checks, health handling, and semester list/current lookup.
 
-The subject, section, registration, and timetable services are scaffolds; their unimplemented operations deliberately return `501 NOT_IMPLEMENTED`. Routes, DTOs, repositories, and some query helpers are present, but the business use cases are not complete and should remain marked pending in [../tasks/BOARD.md](../tasks/BOARD.md).
+Registration, cancellation, and listing are implemented, including system-wide semester credit
+limits and student-row locking. Subject, section, and timetable services still have scaffold
+operations that deliberately return `501 NOT_IMPLEMENTED`; see [../tasks/BOARD.md](../tasks/BOARD.md).
+
+Focused registration and configuration tests are part of `pytest`; the suite uses SQLite in-memory.
+Compose image build/startup, MySQL migration + Alembic metadata check, and Gateway smoke tests have
+been verified separately. Registration business rules and concurrent `SELECT ... FOR UPDATE`
+behavior have not been exercised against MySQL.
 
 The login response uses `accessToken` and nested camelCase `user` data, matching the current frontend adapter. Verify all API details against the reviewed OpenAPI contract when it is added.
 

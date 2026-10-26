@@ -47,7 +47,10 @@ jobs:
           --health-interval=5s --health-timeout=3s --health-retries=20
     env:
       DATABASE_URL: mysql+pymysql://app:app@127.0.0.1:3306/qldt?charset=utf8mb4
+      MYSQL_PASSWORD: app
       JWT_SECRET: ci-only-secret-ci-only-secret-ci-only-1234
+      MIN_CREDITS_PER_SEMESTER: 12
+      MAX_CREDITS_PER_SEMESTER: 24
     steps:
       - uses: actions/checkout@v7
 
@@ -85,6 +88,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Tạo .env chỉ dùng cho CI
+        run: |
+          umask 077
+          {
+            echo "MYSQL_DATABASE=qldt"
+            echo "MYSQL_USER=app"
+            echo "MYSQL_PASSWORD=$(openssl rand -hex 24)"
+            echo "MYSQL_ROOT_PASSWORD=$(openssl rand -hex 24)"
+            echo "JWT_SECRET=$(openssl rand -hex 32)"
+            echo "MIN_CREDITS_PER_SEMESTER=12"
+            echo "MAX_CREDITS_PER_SEMESTER=24"
+          } > .env
 
       - name: Build image và khởi động database
         run: |

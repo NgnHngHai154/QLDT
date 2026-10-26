@@ -1,6 +1,6 @@
 # Chạy trên server (do job deploy chép lên ~/course-registration và chạy).
 # Cần file .env cùng thư mục, TẠO TAY MỘT LẦN trên server (không commit):
-#   MYSQL_ROOT_PASSWORD=...   MYSQL_PASSWORD=...   (nên dùng ký tự an toàn cho URL: chữ + số)
+#   MYSQL_ROOT_PASSWORD=...   MYSQL_PASSWORD=...
 #   JWT_SECRET=...            (chuỗi ngẫu nhiên >= 32 ký tự, vd: openssl rand -hex 32)
 # REGISTRY_IMAGE và IMAGE_TAG do job deploy truyền vào.
 services:
@@ -8,10 +8,10 @@ services:
     image: mysql:8.4
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: qldt
-      MYSQL_USER: app
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-qldt}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required in .env}
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     volumes: ["dbdata:/var/lib/mysql"]
     healthcheck:
@@ -25,18 +25,23 @@ services:
       retries: 20
 
   backend:
-    image: ${REGISTRY_IMAGE:?}/backend:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_IMAGE:?REGISTRY_IMAGE is required}/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       ENVIRONMENT: prod
-      DATABASE_URL: mysql+pymysql://app:${MYSQL_PASSWORD}@db:3306/qldt?charset=utf8mb4
-      JWT_SECRET: ${JWT_SECRET:?}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-qldt}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required in .env}
+      MYSQL_HOST: db
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required in .env}
+      MIN_CREDITS_PER_SEMESTER: ${MIN_CREDITS_PER_SEMESTER:-12}
+      MAX_CREDITS_PER_SEMESTER: ${MAX_CREDITS_PER_SEMESTER:-24}
     depends_on:
       db: { condition: service_healthy }
     expose: ["8000"]
 
   gateway:
-    image: ${REGISTRY_IMAGE:?}/gateway:${IMAGE_TAG:-latest}
+    image: ${REGISTRY_IMAGE:?REGISTRY_IMAGE is required}/gateway:${IMAGE_TAG:-latest}
     restart: unless-stopped
     ports: ["80:80"]
     depends_on:

@@ -1,9 +1,10 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.entity.auth.lecturer import Lecturer
 from app.entity.auth.student import Student
 from app.entity.catalog.course_section import CourseSection
+from app.entity.catalog.subject import Subject
 from app.entity.registration.registration import Registration
 from app.repository.base import BaseRepository
 
@@ -75,6 +76,19 @@ class RegistrationRepository(BaseRepository):
         )
         return list(self.db.scalars(stmt).all())
 
+    def total_credits(self, student_id: int, semester_id: int) -> int:
+        stmt = (
+            select(func.coalesce(func.sum(Subject.credits), 0))
+            .select_from(Registration)
+            .join(CourseSection, Registration.section_id == CourseSection.id)
+            .join(Subject, CourseSection.subject_id == Subject.id)
+            .where(
+                Registration.student_id == student_id,
+                CourseSection.semester_id == semester_id,
+            )
+        )
+        return int(self.db.scalar(stmt) or 0)
+
     def list_by_student(self, student_id: int, semester_id: int) -> list[Registration]:
         stmt = (
             select(Registration)
@@ -91,7 +105,12 @@ class RegistrationRepository(BaseRepository):
                 Registration.student_id == student_id,
                 CourseSection.semester_id == semester_id,
             )
-            .order_by(CourseSection.day_of_week.asc(), CourseSection.start_period.asc())
+            .order_by(
+                CourseSection.day_of_week.asc(),
+                CourseSection.start_period.asc(),
+                Registration.registered_at.asc(),
+                Registration.id.asc(),
+            )
         )
         return list(self.db.scalars(stmt).all())
 

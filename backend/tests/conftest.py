@@ -3,6 +3,7 @@ import os
 # Phải đặt TRƯỚC khi import app: cấu hình được đọc lúc import
 os.environ["ENVIRONMENT"] = "test"
 os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["MYSQL_PASSWORD"] = "test-db-password"
 os.environ["JWT_SECRET"] = "test-secret-test-secret-test-secret-123"
 
 import pytest  # noqa: E402

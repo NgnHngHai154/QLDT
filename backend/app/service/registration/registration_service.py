@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.error_codes import ErrorCode
 from app.core.exceptions import AppError, field_error
 from app.dto.common import ItemList
@@ -23,7 +24,7 @@ class RegistrationService:
         self.registrations = RegistrationRepository(db)
 
     def register(self, user: User, request: RegisterRequest) -> RegistrationDto:
-        student = self.students.get_by_user_id(user.id)
+        student = self.students.get_by_user_id_for_update(user.id)
         if student is None:
             raise AppError(ErrorCode.FORBIDDEN)
 
@@ -36,61 +37,79 @@ class RegistrationService:
 
         if self.registrations.exists(student.id, section.id):
             raise AppError(ErrorCode.ALREADY_REGISTERED)
-
-        same_subject = self.registrations.find_same_subject(
+        if self.registrations.find_same_subject(
             student.id, section.subject_id, section.semester_id
-        )
-        if same_subject is not None:
-            raise AppError(
-                ErrorCode.SAME_SUBJECT_REGISTERED,
-                details=[
-                    field_error(
-                        "sectionId",
-                        f"Bạn đã đăng ký lớp {same_subject.section.section_code} của môn học này",
-                    )
-                ],
-            )
+        ):
+            raise AppError(ErrorCode.SAME_SUBJECT_REGISTERED)
 
         conflicts = self.registrations.find_schedule_conflicts(student.id, section)
         if conflicts:
-            conflict_details = [
-                field_error(
-                    "sectionId",
-                    f"Trùng lịch với lớp {c.section_code} ({c.subject.name})",
-                )
-                for c in conflicts
-            ]
-            raise AppError(ErrorCode.STUDENT_SCHEDULE_CONFLICT, details=conflict_details)
+            raise AppError(
+                ErrorCode.STUDENT_SCHEDULE_CONFLICT,
+                details=[
+                    field_error("sectionCode", f"Lớp {conflict.section_code} bị trùng lịch")
+                    for conflict in conflicts
+                ],
+            )
 
-        # Cập nhật sĩ số có điều kiện (atomic)
-        available = self.sections.increment_enrollment_if_available(section.id)
-        if not available:
+        current_credits = self.registrations.total_credits(student.id, section.semester_id)
+        if current_credits + section.subject.credits > settings.max_credits_per_semester:
+            raise AppError(
+                ErrorCode.CREDIT_LIMIT_EXCEEDED,
+                details=[
+                    field_error("currentCredits", f"Số tín chỉ hiện tại: {current_credits}"),
+                    field_error(
+                        "maxCredits",
+                        f"Mức tối đa: {settings.max_credits_per_semester} tín chỉ",
+                    ),
+                ],
+            )
+
+        if not self.sections.increment_enrollment_if_available(section.id):
             raise AppError(ErrorCode.CLASS_FULL)
 
-        reg = RegistrationEntity(student_id=student.id, section_id=section.id)
-        self.registrations.add(reg)
+        registration = self.registrations.add(
+            RegistrationEntity(student_id=student.id, section_id=section.id)
+        )
         self.db.commit()
-
-        # Nạp lại dữ liệu sau khi commit
-        loaded_reg = self.registrations.get_by_id(reg.id)
-        dto = RegistrationDto.model_validate(loaded_reg)
-        dto.section.registered_by_me = True
-        return dto
+        loaded_registration = self.registrations.get_by_id(registration.id)
+        result = RegistrationDto.model_validate(loaded_registration)
+        result.section.registered_by_me = True
+        return result
 
     def cancel(self, user: User, registration_id: int) -> None:
-        student = self.students.get_by_user_id(user.id)
+        student = self.students.get_by_user_id_for_update(user.id)
         if student is None:
             raise AppError(ErrorCode.FORBIDDEN)
 
-        reg = self.registrations.get_by_id(registration_id)
-        if reg is None:
+        registration = self.registrations.get_by_id(registration_id)
+        if registration is None:
             raise AppError(ErrorCode.NOT_FOUND)
-
-        if reg.student_id != student.id:
+        if registration.student_id != student.id:
             raise AppError(ErrorCode.FORBIDDEN)
 
-        self.sections.decrement_enrollment(reg.section_id)
-        self.registrations.delete(reg)
+        section = registration.section
+        if section is None:
+            raise AppError(ErrorCode.NOT_FOUND)
+
+        current_credits = self.registrations.total_credits(student.id, section.semester_id)
+        if (
+            current_credits >= settings.min_credits_per_semester
+            and current_credits - section.subject.credits < settings.min_credits_per_semester
+        ):
+            raise AppError(
+                ErrorCode.CREDIT_LIMIT_BELOW_MIN,
+                details=[
+                    field_error("currentCredits", f"Số tín chỉ hiện tại: {current_credits}"),
+                    field_error(
+                        "minCredits",
+                        f"Mức tối thiểu: {settings.min_credits_per_semester} tín chỉ",
+                    ),
+                ],
+            )
+
+        self.registrations.delete(registration)
+        self.sections.decrement_enrollment(section.id)
         self.db.commit()
 
     def list_mine(self, user: User, semester_id: int) -> ItemList[RegistrationDto]:
@@ -98,11 +117,10 @@ class RegistrationService:
         if student is None:
             return ItemList[RegistrationDto](items=[])
 
-        regs = self.registrations.list_by_student(student.id, semester_id)
+        registrations = self.registrations.list_by_student(student.id, semester_id)
         items: list[RegistrationDto] = []
-        for r in regs:
-            dto = RegistrationDto.model_validate(r)
+        for registration in registrations:
+            dto = RegistrationDto.model_validate(registration)
             dto.section.registered_by_me = True
             items.append(dto)
-
         return ItemList[RegistrationDto](items=items)

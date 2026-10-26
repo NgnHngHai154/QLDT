@@ -6,8 +6,10 @@
 - `db/schema.sql` and `db/seed/seed.sql` remain the database source of truth. ORM table identifiers and Alembic migrations must preserve their uppercase names and use database `qldt`.
 - Keep one ADMIN seed account only. Sample credentials are documented in `db/README.md`.
 - JWT access token lifetime is 3600 seconds; do not add refresh tokens unless the SRS/API contract changes.
+- `JWT_SECRET` is required and must be at least 32 characters. Semester credit limits are system-wide environment settings (`MIN_CREDITS_PER_SEMESTER=12`, `MAX_CREDITS_PER_SEMESTER=24` by default); maximum must be >= 1 and >= minimum. These are temporary defaults pending group confirmation.
+- Registration/cancellation lock the student's row with `SELECT ... FOR UPDATE` before checking credit and schedule rules. Credit totals sum `SUBJECTS.credits` for registrations in the semester; prerequisite and co-requisite checks are out of scope.
 - All API routes use `/api`; JSON keys are camelCase and errors use the shared FE-BE envelope. Auth returns `accessToken` and a nested `user` object for FE compatibility.
 - Business modules belong in `app/{controller,service,repository,entity,dto}/{auth,catalog,registration,timetable}`; shared configuration and errors belong in `app/core/`, and authentication helpers belong in `app/security/`.
-- All business services for catalog, registration, and timetable (UC002-UC009) are implemented with complete repositories and business logic tests.
+- Catalog, registration, and timetable business services for UC002-UC009 are implemented. Registration and cancellation enforce semester credit limits and lock the student's row; catalog and timetable behavior has automated coverage.
 - Run `ruff check .`, `pytest`, `alembic upgrade head`, and `alembic check` from `backend/`. CI also builds and smoke-tests the Compose gateway stack.
 - `contracts/openapi.yaml` and `contracts/api-types.ts` are synchronized with backend routes and schemas.
