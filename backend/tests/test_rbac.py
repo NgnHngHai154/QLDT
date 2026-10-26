@@ -1,4 +1,4 @@
-"""Kiểm tra lớp phân quyền thứ nhất (Security Filter) — chạy được ngay cả khi Service còn là khung."""
+"""Kiểm tra lớp phân quyền thứ nhất (Security Filter)."""
 
 from tests.conftest import login
 
@@ -16,10 +16,10 @@ def test_lecturer_cannot_register(client):
     assert res.status_code == 403
 
 
-def test_admin_passes_filter_and_hits_unimplemented_service(client):
+def test_admin_passes_filter_and_reaches_service(client):
     res = client.get("/api/subjects", headers=login(client, "admin", "Admin@123"))
-    assert res.status_code == 501  # qua được filter; Service chưa triển khai
-    assert res.json()["error"] == "NOT_IMPLEMENTED"
+    assert res.status_code == 200
+    assert "items" in res.json()
 
 
 def test_section_payload_validation_points_at_field(client):
