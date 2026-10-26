@@ -1,6 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.orm import joinedload
 
 from app.entity.catalog.course_section import CourseSection
+from app.entity.catalog.subject import Subject
 from app.entity.registration.registration import Registration
 from app.repository.base import BaseRepository
 
@@ -59,8 +61,36 @@ class RegistrationRepository(BaseRepository):
         )
         return list(self.db.scalars(stmt).all())
 
+    def total_credits(self, student_id: int, semester_id: int) -> int:
+        stmt = (
+            select(func.coalesce(func.sum(Subject.credits), 0))
+            .select_from(Registration)
+            .join(CourseSection, Registration.section_id == CourseSection.id)
+            .join(Subject, CourseSection.subject_id == Subject.id)
+            .where(
+                Registration.student_id == student_id,
+                CourseSection.semester_id == semester_id,
+            )
+        )
+        return int(self.db.scalar(stmt) or 0)
+
     def list_by_student(self, student_id: int, semester_id: int) -> list[Registration]:
-        raise NotImplementedError  # TODO: join CourseSection, lọc học kỳ, joinedload
+        stmt = (
+            select(Registration)
+            .join(CourseSection, Registration.section_id == CourseSection.id)
+            .where(
+                Registration.student_id == student_id,
+                CourseSection.semester_id == semester_id,
+            )
+            .options(
+                joinedload(Registration.section).joinedload(CourseSection.subject),
+                joinedload(Registration.section).joinedload(CourseSection.semester),
+                joinedload(Registration.section).joinedload(CourseSection.lecturer),
+                joinedload(Registration.section).joinedload(CourseSection.room),
+            )
+            .order_by(Registration.registered_at, Registration.id)
+        )
+        return list(self.db.scalars(stmt).all())
 
     def list_students_of_section(self, section_id: int) -> list[Registration]:
         raise NotImplementedError  # TODO: kèm Student + User để lấy họ tên, email

@@ -19,6 +19,35 @@ Tạo `frontend/.env.local` nếu cần đổi API origin:
 VITE_API_BASE_URL=/api
 ```
 
+## Chuẩn bị sau khi clone
+
+Tạo file cấu hình ở thư mục gốc trước khi chạy Compose hoặc backend:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Thay các giá trị mẫu trong `.env`, đặc biệt là mật khẩu MySQL và `JWT_SECRET`. Tạo virtual
+environment và cài dependency backend (dùng `requirements-dev.txt` nếu cần chạy test):
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+# Nếu cần chạy test, dùng thay thế: pip install -r requirements-dev.txt
+```
+
+| Key | Mô tả |
+|---|---|
+| `MYSQL_DATABASE` | Tên database; mặc định `qldt`. |
+| `MYSQL_USER` | Tài khoản MySQL cho ứng dụng; mặc định `app`. |
+| `MYSQL_PASSWORD` | Mật khẩu tài khoản ứng dụng; bắt buộc, cần thay giá trị mẫu. |
+| `MYSQL_ROOT_PASSWORD` | Mật khẩu root MySQL; bắt buộc, cần thay giá trị mẫu. |
+| `JWT_SECRET` | Bí mật ký JWT; bắt buộc và tối thiểu 32 ký tự. |
+| `MIN_CREDITS_PER_SEMESTER` | Số tín chỉ tối thiểu; mặc định tạm thời `12`. |
+| `MAX_CREDITS_PER_SEMESTER` | Số tín chỉ tối đa; mặc định tạm thời `24`, phải >= 1 và >= mức tối thiểu. |
+
 ## Backend API
 
 Yêu cầu Python 3.12 trở lên và MySQL 8.0.16 trở lên. Từ thư mục gốc, khởi động MySQL:
@@ -34,18 +63,17 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
-Copy-Item .env.example .env
 alembic upgrade head
 python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
 API docs: `http://localhost:8000/api/docs`; health: `http://localhost:8000/health`.
-Chỉnh `backend/.env` để thay `DATABASE_URL` và `JWT_SECRET`; không dùng secret mặc định ở production.
+Backend đọc cấu hình từ biến môi trường và file `.env` ở thư mục gốc; không dùng giá trị mẫu ở production.
 Kiểm thử bằng `pytest` và `ruff check .` từ thư mục `backend/`.
 
-Một số service catalog, registration và timetable vẫn là khung trả `501 NOT_IMPLEMENTED`;
-xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
+Service đăng ký/hủy đã có luồng nghiệp vụ cơ bản; một số service catalog và timetable vẫn trả
+`501 NOT_IMPLEMENTED`. Xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
 
 ## Toàn bộ stack Docker
 

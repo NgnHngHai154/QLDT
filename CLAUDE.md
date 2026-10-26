@@ -11,7 +11,7 @@ Course registration and academic management system for IT3180. The repository is
 - `contracts/openapi.yaml` is the final API contract when the backend team adds it. Do not invent request/response fields while it is absent.
 - SQL schema and seed now live under `db/`; see `db/README.md` for setup.
 - Backend is FastAPI + SQLAlchemy + Alembic under `backend/app/`; migrations must preserve the uppercase SQL table names in `db/schema.sql`.
-- `backend/CLAUDE.md` is the backend-specific harness. Several business services remain scaffolds returning `501 NOT_IMPLEMENTED`.
+- `backend/CLAUDE.md` is the backend-specific harness. Catalog and timetable service operations remain scaffolds returning `501 NOT_IMPLEMENTED`; registration register/cancel/list are implemented.
 - `docker-compose.yml` is the local stack entry point; `.github/workflows/ci-cd.yml` runs backend checks, migrations, and gateway smoke tests.
 
 ## Working rules

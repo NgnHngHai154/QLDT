@@ -22,6 +22,8 @@ class ErrorCode(str, Enum):
     ALREADY_REGISTERED = "ALREADY_REGISTERED"
     SAME_SUBJECT_REGISTERED = "SAME_SUBJECT_REGISTERED"
     STUDENT_SCHEDULE_CONFLICT = "STUDENT_SCHEDULE_CONFLICT"
+    CREDIT_LIMIT_EXCEEDED = "CREDIT_LIMIT_EXCEEDED"
+    CREDIT_LIMIT_BELOW_MIN = "CREDIT_LIMIT_BELOW_MIN"
     INTERNAL_ERROR = "INTERNAL_ERROR"
 
 
@@ -47,5 +49,10 @@ ERROR_SPECS: dict[ErrorCode, tuple[int, str]] = {
     ErrorCode.ALREADY_REGISTERED: (409, "Bạn đã đăng ký lớp học phần này"),
     ErrorCode.SAME_SUBJECT_REGISTERED: (409, "Bạn đã đăng ký môn học này ở lớp khác"),
     ErrorCode.STUDENT_SCHEDULE_CONFLICT: (409, "Lớp trùng lịch học với lớp bạn đã đăng ký"),
+    ErrorCode.CREDIT_LIMIT_EXCEEDED: (409, "Vượt quá giới hạn tín chỉ tối đa trong học kỳ"),
+    ErrorCode.CREDIT_LIMIT_BELOW_MIN: (
+        409,
+        "Không thể hủy vì số tín chỉ sẽ thấp hơn mức tối thiểu",
+    ),
     ErrorCode.INTERNAL_ERROR: (500, "Hệ thống đang gặp lỗi, vui lòng thử lại sau"),
 }
