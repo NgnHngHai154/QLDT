@@ -87,6 +87,16 @@ export default function SectionCatalogPage() {
     },
     onError: (error: unknown) => {
       const body = readApiError(error);
+      if (body?.error === "CREDIT_LIMIT_EXCEEDED") {
+        const details = body.details.map((detail) => detail.message).filter(Boolean);
+        messageApi.error(
+          details.length
+            ? `Không thể đăng ký. ${details.join("; ")}`
+            : "Đăng ký vượt quá số tín chỉ tối đa trong học kỳ.",
+        );
+        void queryClient.invalidateQueries({ queryKey: ["sections", semesterId] });
+        return;
+      }
       const errors: Record<string, string> = {
         CLASS_FULL: "Lớp học phần đã đủ sĩ số.",
         ALREADY_REGISTERED: "Bạn đã đăng ký lớp học phần này.",

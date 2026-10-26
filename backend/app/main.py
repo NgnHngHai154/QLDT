@@ -2,16 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.controller.router import api_router
-from app.core.config import DEFAULT_JWT_SECRET, settings
+from app.core.config import settings
 from app.core.error_handlers import register_exception_handlers
 from app.core.logging import setup_logging
 
 
 def create_app() -> FastAPI:
     setup_logging()
-
-    if settings.environment not in ("dev", "test") and settings.jwt_secret == DEFAULT_JWT_SECRET:
-        raise RuntimeError("Phải đặt JWT_SECRET khi chạy ngoài môi trường dev/test")
 
     app = FastAPI(
         title=settings.app_name,

@@ -1,13 +1,27 @@
-from sqlalchemy import or_, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.engine import CursorResult
+from sqlalchemy.orm import joinedload
 
+from app.entity.auth.lecturer import Lecturer
 from app.entity.catalog.course_section import CourseSection
+from app.entity.catalog.subject import Subject
+from app.entity.registration.registration import Registration
 from app.repository.base import BaseRepository
 
 
 class SectionRepository(BaseRepository):
     def get_by_id(self, section_id: int) -> CourseSection | None:
-        return self.db.get(CourseSection, section_id)
+        stmt = (
+            select(CourseSection)
+            .options(
+                joinedload(CourseSection.subject),
+                joinedload(CourseSection.semester),
+                joinedload(CourseSection.lecturer).joinedload(Lecturer.user),
+                joinedload(CourseSection.room),
+            )
+            .where(CourseSection.id == section_id)
+        )
+        return self.db.scalars(stmt).first()
 
     def search(
         self,
@@ -17,15 +31,72 @@ class SectionRepository(BaseRepository):
         offset: int,
         limit: int,
         sort: str | None,
-    ):
-        """Trả (danh sách CourseSection, tổng số). TODO: dùng joinedload để tránh N+1."""
-        raise NotImplementedError
+    ) -> tuple[list[CourseSection], int]:
+        """Trả (danh sách CourseSection, tổng số). dùng joinedload để tránh N+1."""
+        stmt = (
+            select(CourseSection)
+            .join(CourseSection.subject)
+            .options(
+                joinedload(CourseSection.subject),
+                joinedload(CourseSection.semester),
+                joinedload(CourseSection.lecturer).joinedload(Lecturer.user),
+                joinedload(CourseSection.room),
+            )
+            .where(CourseSection.semester_id == semester_id)
+        )
+        count_stmt = (
+            select(func.count(CourseSection.id))
+            .join(CourseSection.subject)
+            .where(CourseSection.semester_id == semester_id)
+        )
+
+        if subject_id is not None:
+            stmt = stmt.where(CourseSection.subject_id == subject_id)
+            count_stmt = count_stmt.where(CourseSection.subject_id == subject_id)
+
+        if keyword:
+            kw = f"%{keyword.strip()}%"
+            condition = or_(
+                CourseSection.section_code.ilike(kw),
+                Subject.subject_code.ilike(kw),
+                Subject.name.ilike(kw),
+            )
+            stmt = stmt.where(condition)
+            count_stmt = count_stmt.where(condition)
+
+        total = self.db.scalar(count_stmt) or 0
+        stmt = (
+            stmt.order_by(CourseSection.day_of_week.asc(), CourseSection.start_period.asc())
+            .offset(offset)
+            .limit(limit)
+        )
+        items = list(self.db.scalars(stmt).all())
+        return items, total
 
     def list_by_lecturer(self, lecturer_id: int, semester_id: int) -> list[CourseSection]:
-        raise NotImplementedError
+        stmt = (
+            select(CourseSection)
+            .options(
+                joinedload(CourseSection.subject),
+                joinedload(CourseSection.semester),
+                joinedload(CourseSection.lecturer).joinedload(Lecturer.user),
+                joinedload(CourseSection.room),
+            )
+            .where(
+                CourseSection.lecturer_id == lecturer_id,
+                CourseSection.semester_id == semester_id,
+            )
+            .order_by(CourseSection.day_of_week.asc(), CourseSection.start_period.asc())
+        )
+        return list(self.db.scalars(stmt).all())
 
     def exists_by_code(self, section_code: str) -> bool:
-        raise NotImplementedError
+        stmt = select(CourseSection.id).where(CourseSection.section_code == section_code)
+        return self.db.scalars(stmt).first() is not None
+
+    def count_registrations(self, section_id: int) -> int:
+        stmt = select(func.count(Registration.id)).where(Registration.section_id == section_id)
+        return self.db.scalar(stmt) or 0
 
     def add(self, section: CourseSection) -> CourseSection:
         self.db.add(section)

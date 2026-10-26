@@ -66,7 +66,14 @@ export default function MyRegistrationsPage() {
     onError: (error: unknown) => {
       const body = readApiError(error);
       if (body?.error === "FORBIDDEN") messageApi.error("Bạn không có quyền hủy đăng ký này.");
-      else messageApi.error("Không thể hủy đăng ký lúc này. Vui lòng tải lại danh sách.");
+      else if (body?.error === "CREDIT_LIMIT_BELOW_MIN") {
+        const details = body.details.map((detail) => detail.message).filter(Boolean);
+        messageApi.error(
+          details.length
+            ? `Không thể hủy. ${details.join("; ")}`
+            : "Không thể hủy vì số tín chỉ sẽ thấp hơn mức tối thiểu của học kỳ.",
+        );
+      } else messageApi.error("Không thể hủy đăng ký lúc này. Vui lòng tải lại danh sách.");
     },
   });
 
