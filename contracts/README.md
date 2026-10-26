@@ -1,5 +1,5 @@
 # API Contracts
 
-`openapi.yaml` is the source of truth for API request/response schemas, methods, status codes, and error details. It has not yet been supplied, so it is intentionally not replaced with a guessed or incomplete document.
+`openapi.yaml` is the authoritative OpenAPI 3.1.0 contract defining request/response schemas, paths, status codes, and error details for all endpoints (UC001-UC009).
 
-The backend owner should add it here, then generate `api-types.ts` and examples. Frontend implementation must compare its provisional login adapter with that contract before integration.
+`api-types.ts` provides the TypeScript interfaces generated from the contract for frontend consumption (and re-exported under `frontend/src/shared/api/api-types.ts`).
