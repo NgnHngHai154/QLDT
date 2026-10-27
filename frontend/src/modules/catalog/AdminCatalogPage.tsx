@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Card, Empty, Select, Spin, Table, Tag } from "antd";
 import api, { requireItems } from "../../shared/api/client";
@@ -45,6 +45,12 @@ export default function AdminCatalogPage({ resource }: { resource: "subjects" | 
     enabled: !isSubjects,
     queryFn: async () => requireItems<Semester>((await api.get<ItemsResponse<Semester>>("/semesters")).data),
   });
+
+  useEffect(() => {
+    if (!isSubjects && semesterId === undefined && semestersQuery.data && semestersQuery.data.length > 0) {
+      setSemesterId(semestersQuery.data[0].semesterId);
+    }
+  }, [isSubjects, semestersQuery.data, semesterId]);
 
   const subjectsQuery = useQuery({
     queryKey: ["subjects", page],

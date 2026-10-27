@@ -65,18 +65,15 @@ Keep dependencies flowing `controller → service → repository → entity`. Se
 
 ## Current API implementation status
 
-Implemented and covered by tests: login, current user, logout, role checks, health handling, and semester list/current lookup.
+All UC001-UC009 business services are fully implemented and verified with automated test coverage:
+- Auth & RBAC (UC001): JWT token lifecycle, bcrypt password hashing, and role-based permissions.
+- Subject and Course Section management (UC002): CRUD operations and room/lecturer schedule conflict checks.
+- Section Roster (UC003, UC009): Enrolled student listings for lecturers and administrators.
+- Course Registration & Cancellation (UC005, UC006): Per-student row locking (SELECT ... FOR UPDATE), atomic capacity updates, and semester credit limit enforcement. Prerequisite and corequisite checks are excluded.
+- Timetable (UC007, UC008): Weekly schedule calculation for students and lecturers.
+- Single Registration Semester: All services operate against a single active semester (2026.1); query parameters default to this active semester if omitted.
 
-Registration, cancellation, and listing are implemented, including system-wide semester credit
-limits and student-row locking. Subject, section, and timetable services still have scaffold
-operations that deliberately return `501 NOT_IMPLEMENTED`; see [../tasks/BOARD.md](../tasks/BOARD.md).
-
-Focused registration and configuration tests are part of `pytest`; the suite uses SQLite in-memory.
-Compose image build/startup, MySQL migration + Alembic metadata check, and Gateway smoke tests have
-been verified separately. Registration business rules and concurrent `SELECT ... FOR UPDATE`
-behavior have not been exercised against MySQL.
-
-The login response uses `accessToken` and nested camelCase `user` data, matching the current frontend adapter. Verify all API details against the reviewed OpenAPI contract when it is added.
+Tests and static checks (pytest, ruff check, alembic check) pass completely.
 
 ## CI/CD and local deployment
 

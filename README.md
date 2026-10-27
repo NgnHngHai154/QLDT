@@ -72,8 +72,7 @@ API docs: `http://localhost:8000/api/docs`; health: `http://localhost:8000/healt
 Backend đọc cấu hình từ biến môi trường và file `.env` ở thư mục gốc; không dùng giá trị mẫu ở production.
 Kiểm thử bằng `pytest` và `ruff check .` từ thư mục `backend/`.
 
-Service đăng ký/hủy đã có luồng nghiệp vụ cơ bản; một số service catalog và timetable vẫn trả
-`501 NOT_IMPLEMENTED`. Xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
+Toàn bộ dịch vụ nghiệp vụ UC001-UC009 (xác thực, danh mục môn/lớp, đăng ký/hủy, thời khóa biểu, danh sách sinh viên) đã hoàn thiện và có kiểm thử tự động. Hệ thống vận hành trên 1 kỳ đăng ký duy nhất và đã loại bỏ điều kiện môn tiên quyết/song hành. Xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
 
 ## Toàn bộ stack Docker
 

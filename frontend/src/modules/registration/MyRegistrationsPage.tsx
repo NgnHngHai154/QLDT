@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Alert, Button, Card, Empty, Select, Spin, Tag, message } from "antd";
 import api, { readApiError, requireItems } from "../../shared/api/client";
@@ -44,6 +44,12 @@ export default function MyRegistrationsPage() {
     queryKey: ["semesters"],
     queryFn: async () => requireItems<Semester>((await api.get<ItemsResponse<Semester>>("/semesters")).data),
   });
+
+  useEffect(() => {
+    if (semesterId === undefined && semestersQuery.data && semestersQuery.data.length > 0) {
+      setSemesterId(semestersQuery.data[0].semesterId);
+    }
+  }, [semestersQuery.data, semesterId]);
 
   const registrationsQuery = useQuery({
     queryKey: ["registrations", semesterId],

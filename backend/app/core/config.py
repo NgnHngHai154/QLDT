@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     database_url: str = ""
     mysql_database: str = "qldt"
     mysql_user: str = "app"
-    mysql_password: str = Field(min_length=1)
+    mysql_password: str = Field(default="", min_length=0)
     mysql_host: str = "localhost"
     mysql_port: int = 3306
 

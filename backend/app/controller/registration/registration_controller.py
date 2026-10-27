@@ -4,6 +4,7 @@ from app.core.database import DbSession
 from app.dto.common import ItemList
 from app.dto.registration.registration import RegisterRequest, Registration
 from app.security.dependencies import StudentUser
+from app.service.catalog.semester_service import SemesterService
 from app.service.registration.registration_service import RegistrationService
 
 router = APIRouter(prefix="/registrations", tags=["registration"])
@@ -22,8 +23,10 @@ def register(body: RegisterRequest, user: StudentUser, db: DbSession):
 # /me phải đứng TRƯỚC /{registration_id}
 @router.get("/me", response_model=ItemList[Registration], summary="Các lớp đã đăng ký của tôi")
 def my_registrations(
-    user: StudentUser, db: DbSession, semester_id: int = Query(alias="semesterId")
+    user: StudentUser, db: DbSession, semester_id: int | None = Query(None, alias="semesterId")
 ):
+    if semester_id is None:
+        semester_id = SemesterService(db).get_current().semester_id
     return RegistrationService(db).list_mine(user, semester_id)
 
 

@@ -11,7 +11,7 @@ Course registration and academic management system for IT3180. The repository is
 - `contracts/openapi.yaml` and `contracts/api-types.ts` define the official API contract and shared TypeScript types for frontend and backend.
 - SQL schema and seed live under `db/`; see `db/README.md` for setup.
 - Backend is FastAPI + SQLAlchemy + Alembic under `backend/app/`; migrations preserve the uppercase SQL table names in `db/schema.sql`.
-- `backend/CLAUDE.md` is the backend-specific harness. Business services for UC001-UC009 are implemented; registration enforces semester credit limits and serializes a student's registration changes.
+- `backend/CLAUDE.md` is the backend-specific harness. Business services for UC001-UC009 are implemented; registration operates on a single active semester, enforces credit limits, and serializes registration changes. Prerequisite and corequisite checks are excluded.
 - `docker-compose.yml` is the local stack entry point; `.github/workflows/ci-cd.yml` runs backend checks, migrations, and gateway smoke tests.
 
 ## Working rules

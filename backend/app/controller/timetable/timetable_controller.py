@@ -5,6 +5,7 @@ from app.dto.catalog.catalog import Section
 from app.dto.common import ItemList
 from app.dto.timetable.timetable import Timetable
 from app.security.dependencies import LecturerUser, StudentUser
+from app.service.catalog.semester_service import SemesterService
 from app.service.timetable.timetable_service import TimetableService
 
 router = APIRouter(tags=["timetable"])
@@ -16,9 +17,11 @@ router = APIRouter(tags=["timetable"])
 def student_timetable(
     user: StudentUser,
     db: DbSession,
-    semester_id: int = Query(alias="semesterId"),
+    semester_id: int | None = Query(None, alias="semesterId"),
     week: int | None = Query(None, ge=1),
 ):
+    if semester_id is None:
+        semester_id = SemesterService(db).get_current().semester_id
     return TimetableService(db).student_timetable(user, semester_id, week)
 
 
@@ -28,9 +31,11 @@ def student_timetable(
 def lecturer_timetable(
     user: LecturerUser,
     db: DbSession,
-    semester_id: int = Query(alias="semesterId"),
+    semester_id: int | None = Query(None, alias="semesterId"),
     week: int | None = Query(None, ge=1),
 ):
+    if semester_id is None:
+        semester_id = SemesterService(db).get_current().semester_id
     return TimetableService(db).lecturer_timetable(user, semester_id, week)
 
 
@@ -38,6 +43,8 @@ def lecturer_timetable(
     "/lecturers/me/sections", response_model=ItemList[Section], summary="Các lớp được phân công"
 )
 def lecturer_sections(
-    user: LecturerUser, db: DbSession, semester_id: int = Query(alias="semesterId")
+    user: LecturerUser, db: DbSession, semester_id: int | None = Query(None, alias="semesterId")
 ):
+    if semester_id is None:
+        semester_id = SemesterService(db).get_current().semester_id
     return TimetableService(db).lecturer_sections(user, semester_id)

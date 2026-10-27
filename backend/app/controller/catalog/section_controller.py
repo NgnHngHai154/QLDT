@@ -12,6 +12,7 @@ from app.dto.catalog.catalog import (
 from app.dto.common import Page
 from app.security.dependencies import AdminOrLecturer, AdminOrStudent, AdminUser
 from app.service.catalog.section_service import SectionService
+from app.service.catalog.semester_service import SemesterService
 
 router = APIRouter(prefix="/sections", tags=["catalog"])
 
@@ -21,10 +22,12 @@ def list_sections(
     user: AdminOrStudent,
     db: DbSession,
     paging: Pagination,
-    semester_id: int = Query(alias="semesterId"),  # bắt buộc
+    semester_id: int | None = Query(None, alias="semesterId"),
     subject_id: int | None = Query(None, alias="subjectId"),
     keyword: str | None = None,
 ):
+    if semester_id is None:
+        semester_id = SemesterService(db).get_current().semester_id
     return SectionService(db).list(user, semester_id, subject_id, keyword, paging)
 
 

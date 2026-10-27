@@ -27,6 +27,6 @@ The seed now has exactly one ADMIN. Its password is `admin`; lecturer and studen
 | LECTURER | `gv001` through `gv010` | `123456` | `GV001` through `GV010` |
 | STUDENT | `sv20210001` through `sv20211000` | `123456` | `20210001` through `20211000` |
 
-The seed contains 1 admin, 10 lecturers, 1,000 students, 100 subjects, 3 semesters, 30 rooms, and 400 sections. Registrations start empty and `current_enrollment` starts at 0. The current sample semester is `2026.1` (`semester_id = 3`). Student usernames use `sv` followed by student code.
+The seed contains 1 admin, 10 lecturers, 1,000 students, 100 subjects, 1 active semester (`2026.1`, `semester_id = 1`), 30 rooms, and 400 sections in this single active registration semester. Registrations start empty and `current_enrollment` starts at 0. Student usernames use `sv` followed by student code.
 
 Do not expose password hashes to the client.

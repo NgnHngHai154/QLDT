@@ -1,6 +1,6 @@
 # QLDT Frontend
 
-React + TypeScript + Vite app. Implemented slices include the login/auth shell, student section registration/cancellation, weekly timetable, read-only ADMIN catalogs, and lecturer section/roster views.
+React + TypeScript + Vite app. Implemented slices include the login/auth shell, student section registration/cancellation, weekly timetable, unified course and section catalogs, and lecturer section/roster views.
 
 ## Run locally
 
@@ -17,6 +17,8 @@ Set `VITE_API_BASE_URL` in `.env.local` if the backend is not served from the sa
 - `src/modules`: auth, catalog, registration, and timetable features.
 - `src/shared`: API client and shared UI/hooks/utilities.
 
-## Contract note
+## Key Features
 
-The login adapter posts `{ "username": "...", "password": "..." }` to `/api/auth/login`, stores `accessToken`, and reads the nested `user` returned by login or `/api/auth/me`. Confirm the exact response/error schema against `../contracts/openapi.yaml` before production integration. ADMIN write operations and roster field rendering remain gated on their missing schemas.
+- Single active registration semester: registration, timetable, and section views auto-bind to the active semester; course catalog is unified without semester fragmentation or prerequisite/corequisite constraints.
+- Roster student table is implemented in `SectionRosterPage` for UC003/UC009.
+- Error handling maps API error codes directly to user feedback.

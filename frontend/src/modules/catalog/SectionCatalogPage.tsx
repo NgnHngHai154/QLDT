@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Alert, Button, Card, Empty, Input, Select, Spin, Tag, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
@@ -64,6 +64,12 @@ export default function SectionCatalogPage() {
     queryKey: ["semesters"],
     queryFn: async () => requireItems<Semester>((await api.get<ItemsResponse<Semester>>("/semesters")).data),
   });
+
+  useEffect(() => {
+    if (semesterId === undefined && semestersQuery.data && semestersQuery.data.length > 0) {
+      setSemesterId(semestersQuery.data[0].semesterId);
+    }
+  }, [semestersQuery.data, semesterId]);
 
   const sectionsQuery = useQuery({
     queryKey: ["sections", semesterId, page],

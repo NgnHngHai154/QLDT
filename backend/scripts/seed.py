@@ -55,14 +55,39 @@ def main() -> None:
                     semester_code="2026.1",
                     name="Học kỳ 1 năm học 2026-2027",
                     start_date=date(2026, 9, 7),
-                    end_date=date(2026, 12, 20),
-                    num_weeks=15,
+                    end_date=date(2027, 1, 18),
+                    num_weeks=20,
                 )
             )
         if not db.scalars(select(Room).where(Room.room_code == "D9-301")).first():
             db.add(Room(room_code="D9-301", building="D9", capacity=60))
         if not db.scalars(select(Subject).where(Subject.subject_code == "IT3180")).first():
             db.add(Subject(subject_code="IT3180", name="Nhập môn Công nghệ phần mềm", credits=3))
+        db.flush()
+
+        sem = db.scalars(select(Semester).where(Semester.semester_code == "2026.1")).first()
+        subj = db.scalars(select(Subject).where(Subject.subject_code == "IT3180")).first()
+        room = db.scalars(select(Room).where(Room.room_code == "D9-301")).first()
+        if sem and subj and room and gv.lecturer:
+            from app.entity.catalog.course_section import CourseSection
+
+            if not db.scalars(select(CourseSection).where(CourseSection.section_code == "150001")).first():
+                db.add(
+                    CourseSection(
+                        section_code="150001",
+                        subject_id=subj.id,
+                        semester_id=sem.id,
+                        lecturer_id=gv.lecturer.id,
+                        room_id=room.id,
+                        day_of_week=2,
+                        start_period=1,
+                        end_period=3,
+                        start_week=1,
+                        end_week=20,
+                        max_capacity=50,
+                        current_enrollment=0,
+                    )
+                )
 
         db.commit()
     print("Đã nạp dữ liệu mẫu: admin / admin, gv001 / 123456, sv20210001 / 123456")

@@ -40,4 +40,5 @@ class SemesterService:
             chosen = next((s for s in all_semesters if s.start_date <= today), all_semesters[-1])
 
         base = Semester.model_validate(chosen).model_dump()
-        return CurrentSemester(**base, current_week=week_of(chosen, today))
+        week = week_of(chosen, today)
+        return CurrentSemester(**base, current_week=week if week is not None else 1)
