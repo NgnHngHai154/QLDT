@@ -30,7 +30,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "../modules/auth/AuthContext";
-import AdminCatalogPage from "../modules/catalog/AdminCatalogPage";
+import AdminCatalogPage from "../modules/catalog/AdminCatalogPage"; import AdminTimetablePage from "../modules/timetable/AdminTimetablePage";
+import CourseCatalogPage from "../modules/catalog/CourseCatalogPage";
 import { LecturerSectionsPage, SectionRosterPage } from "../modules/catalog/SectionAccessPages";
 import SectionCatalogPage from "../modules/catalog/SectionCatalogPage";
 import MyRegistrationsPage from "../modules/registration/MyRegistrationsPage";
@@ -57,7 +58,7 @@ const navigation: Record<UserRole, Array<{ key: string; label: string; icon: Rea
   ],
   ADMIN: [
     { key: "/app/subjects", label: "Môn học", icon: <BookOutlined /> },
-    { key: "/app/sections", label: "Lớp học phần", icon: <AppstoreOutlined /> },
+    { key: "/app/sections", label: "Lớp học phần", icon: <AppstoreOutlined /> }, { key: "/app/timetable/manage", label: "Xếp lịch & phân công", icon: <CalendarOutlined /> },
   ],
 };
 
@@ -190,7 +191,7 @@ function ProtectedApp() {
     pageContent = <TimetablePage role={user.role} />;
   } else if (user.role === "LECTURER" && location.pathname === "/app/sections") {
     pageContent = <LecturerSectionsPage />;
-  } else if (user.role === "ADMIN" && location.pathname === "/app/subjects") {
+  } else if (user.role === "ADMIN" && location.pathname === "/app/timetable/manage") { pageContent = <AdminTimetablePage />; } else if (user.role === "ADMIN" && location.pathname === "/app/subjects") {
     pageContent = <AdminCatalogPage resource="subjects" />;
   } else if (user.role === "ADMIN" && location.pathname === "/app/sections") {
     pageContent = <AdminCatalogPage resource="sections" />;
@@ -235,9 +236,11 @@ function AppRoutes() {
   const { user, loading, authError } = useAuth();
   return (
     <Routes>
+      <Route path="/timetable/manage" element={<AdminTimetablePage />} /> <Route path="/courses" element={<CourseCatalogPage />} />
       <Route path="/login" element={authError?.status === 403 ? <AccessDenied /> : loading ? <div className="app-loading"><Spin size="large" /></div> : user ? <Navigate to="/app" replace /> : <LoginPage />} />
       <Route path="/app/*" element={<ProtectedApp />} />
-      <Route path="*" element={<Navigate to={user ? "/app" : "/login"} replace />} />
+      <Route path="/" element={<Navigate to="/courses" replace />} />
+      <Route path="*" element={<Navigate to="/courses" replace />} />
     </Routes>
   );
 }
