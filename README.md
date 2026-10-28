@@ -40,6 +40,29 @@ Vite chạy tại `http://localhost:5173`, proxy `/api` tới backend `http://lo
 
 Seed dev tạo tài khoản `admin / admin`, `gv001 / 123456`, `sv20210001 / 123456`. Chỉ dùng các mật khẩu mẫu ở môi trường local.
 
+### Nạp bộ dữ liệu đầy đủ (100 môn học / 400 lớp)
+
+`python -m scripts.seed` chỉ tạo dữ liệu dev tối thiểu. Để dùng bộ dữ liệu chuẩn trong
+`db/seed/seed.sql` (1.000 sinh viên, 10 giảng viên, 100 môn, 400 lớp), thay toàn bộ schema và
+dữ liệu hiện tại của database `qldt`:
+
+> Cảnh báo: `db/schema.sql` xóa và tạo lại toàn bộ bảng. Sao lưu dữ liệu cần giữ trước khi chạy.
+> Trên database mới, dùng cách này **thay cho** `alembic upgrade head` + `python -m scripts.seed`
+> (xem [db/README.md](db/README.md)); không áp dụng cả hai lên cùng một database.
+
+```powershell
+docker compose exec -T db sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --databases qldt > /tmp/qldt-backup.sql'
+docker compose cp db:/tmp/qldt-backup.sql qldt-backup.sql
+docker compose cp db/schema.sql db:/tmp/schema.sql
+docker compose cp db/seed/seed.sql db:/tmp/seed.sql
+docker compose exec -T db sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot < /tmp/schema.sql'
+docker compose exec -T db sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot qldt < /tmp/seed.sql'
+```
+
+Sau đó khởi động lại backend và tải lại frontend. Dữ liệu nằm trong Docker volume `dbdata`,
+nên chỉ cần nạp **một lần**; không cần chạy lại mỗi lần khởi động máy. Chỉ nạp lại khi muốn reset
+database hoặc sau khi xóa volume bằng `docker compose down -v`.
+
 ## Chạy kiểm tra
 
 ```powershell
