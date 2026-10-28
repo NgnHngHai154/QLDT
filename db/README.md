@@ -18,10 +18,12 @@ For an API-managed database, create the `qldt` database and run `alembic upgrade
 from `backend/` instead. Do not load `schema.sql` and apply the initial Alembic migration
 to the same empty database; they are alternate ways to create the same schema.
 
-For routine local application development, follow the root [README](../README.md): migrations
-create the schema and `python -m scripts.seed` inserts the small idempotent dev fixture. Do not
-run that dev seed and the full SQL seed against the same database. Neither seed command is a
-database reset or a repair command; inspect/back up existing data before changing or reloading it.
+For routine local application development, the root [README](../README.md) loads this full
+sample data by default, then runs `alembic stamp head` from `backend/` so future migrations know
+the schema is current. If you prefer the small idempotent fixture instead, use
+`alembic upgrade head` and `python -m scripts.seed`; do not combine that path with the full SQL
+seed. Neither seed command is a database reset or a repair command; inspect/back up existing data
+before changing or reloading it.
 
 ## Sample accounts and data
 
