@@ -1,6 +1,8 @@
 # Quy ước API FE-BE
 
-Quy ước này được cập nhật sau tài liệu thiết kế và được ưu tiên khi có mâu thuẫn. `contracts/openapi.yaml` là nguồn schema cuối cùng nhưng hiện chưa có trong repository.
+Resource objects (subject, section, semester) expose `id` in responses; `subjectId`, `sectionId`, and `semesterId` are request references/query parameters. Keep frontend types aligned with `contracts/api-types.ts`.
+
+Quy ước này được cập nhật sau tài liệu thiết kế và được ưu tiên khi có mâu thuẫn. `contracts/openapi.yaml` là nguồn schema cuối cùng trong repository.
 
 ## JSON và HTTP
 
@@ -26,7 +28,8 @@ Quy ước này được cập nhật sau tài liệu thiết kế và được 
 | `POST /api/auth/login` | Xác thực |
 | `GET /api/auth/me` | Tài khoản hiện tại |
 | `POST /api/auth/logout` | Tùy chọn |
-| `/api/subjects` | CRUD môn học, ADMIN |
+| `GET /api/subjects` | Tra cứu công khai danh mục môn học |
+| `POST/PUT/DELETE /api/subjects` | Quản lý môn học, ADMIN |
 | `/api/sections` | CRUD lớp; danh sách yêu cầu `semesterId`, ADMIN CRUD |
 | `GET /api/sections/lookups` | Lookup cho form lớp |
 | `GET /api/sections/{id}/students` | ADMIN hoặc giảng viên phụ trách |

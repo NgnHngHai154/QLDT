@@ -26,7 +26,7 @@ def my_registrations(
     user: StudentUser, db: DbSession, semester_id: int | None = Query(None, alias="semesterId")
 ):
     if semester_id is None:
-        semester_id = SemesterService(db).get_current().semester_id
+        semester_id = SemesterService(db).get_current().id
     return RegistrationService(db).list_mine(user, semester_id)
 
 

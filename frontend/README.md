@@ -4,12 +4,16 @@ React + TypeScript + Vite app. Implemented slices include the login/auth shell, 
 
 ## Run locally
 
+For the full FE–BE–DB setup, use the root [README](../README.md). To run the frontend by itself,
+from `frontend/`:
+
 ```bash
 npm install
 npm run dev
 ```
 
-Set `VITE_API_BASE_URL` in `.env.local` if the backend is not served from the same origin. The default is `/api`.
+Vite serves the app at `http://localhost:5173` and proxies `/api` to `http://127.0.0.1:8000`.
+Set `VITE_API_BASE_URL` in `.env.local` only when using a different API origin; the default is `/api`.
 
 ## Structure
 
@@ -19,6 +23,13 @@ Set `VITE_API_BASE_URL` in `.env.local` if the backend is not served from the sa
 
 ## Key Features
 
-- Single active registration semester: registration, timetable, and section views auto-bind to the active semester; course catalog is unified without semester fragmentation or prerequisite/corequisite constraints.
+- Use the shared types from `contracts/api-types.ts`: resource objects expose `id`; request references use names such as `sectionId` and `semesterId`.
+
+- Single active registration semester: registration, timetable, and section views auto-bind to the active semester. Course catalog reads the backend subject API; admin subject/section forms and timetable assignments persist through backend APIs.
 - Roster student table is implemented in `SectionRosterPage` for UC003/UC009.
 - Error handling maps API error codes directly to user feedback.
+
+## UI conventions
+
+- Shared typography and layout tokens live in `src/styles.css`; keep font stacks, spacing, cards, tables, and form controls consistent across modules.
+- The academic portal uses a restrained HUST-inspired red accent and table-first information hierarchy. Avoid module-local font overrides unless a content type needs a deliberate distinction.

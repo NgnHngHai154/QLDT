@@ -6,7 +6,8 @@ Database source is organized here:
 - `seed/seed.sql`: sample accounts and academic data.
 - `../backend/migrations/`: Alembic migrations used by the API and CI; keep them aligned with this canonical SQL schema.
 
-Requires MySQL 8.0.16 or later. From this directory, load the schema and then the seed:
+Requires MySQL 8.0.16 or later. These SQL files are the canonical full sample database path.
+On a new, empty database, load the schema and then the seed:
 
 ```bash
 mysql -u root -p < schema.sql
@@ -16,6 +17,11 @@ mysql -u root -p < seed/seed.sql
 For an API-managed database, create the `qldt` database and run `alembic upgrade head`
 from `backend/` instead. Do not load `schema.sql` and apply the initial Alembic migration
 to the same empty database; they are alternate ways to create the same schema.
+
+For routine local application development, follow the root [README](../README.md): migrations
+create the schema and `python -m scripts.seed` inserts the small idempotent dev fixture. Do not
+run that dev seed and the full SQL seed against the same database. Neither seed command is a
+database reset or a repair command; inspect/back up existing data before changing or reloading it.
 
 ## Sample accounts and data
 

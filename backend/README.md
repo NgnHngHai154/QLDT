@@ -2,17 +2,17 @@
 
 Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · MySQL 8 · JWT + Bcrypt.
 
-The reviewed FE-BE conventions take precedence over older design notes. The canonical SQL schema and seed remain under `../db/`; `contracts/openapi.yaml` is still pending. The generated FastAPI document at `/api/openapi.json` describes the current implementation, not an approved replacement contract.
+The reviewed FE-BE conventions take precedence over older design notes. The canonical SQL schema, seed, and API contract remain under `../db/` and `../contracts/`. The generated FastAPI document at `/api/openapi.json` describes the current implementation.
 
 ## Local run
 
-From the repository root, start the MySQL service:
+For the complete local setup and terminal commands, follow the root [README](../README.md). The short backend-only sequence is below. Start MySQL from the repository root:
 
 ```powershell
 docker compose up -d db
 ```
 
-Then, from this directory:
+Then, from `backend/` (create the virtual environment and install dependencies only on first run):
 
 ```powershell
 python -m venv .venv
@@ -23,15 +23,17 @@ python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-Configuration is read from the repository-root `.env` (and then this directory's optional `.env`)
-or process environment. Copy the root `.env.example` to `.env` and set both MySQL passwords plus
-a `JWT_SECRET` of at least 32 characters before running Compose or the API.
+Configuration is read from the repository-root `.env` (then this directory's optional `.env`)
+or process environment. Copy `.env.example` to the repository root as `.env`; set both MySQL
+passwords and a `JWT_SECRET` of at least 32 characters before starting Compose or the API.
 
 - API docs: `http://localhost:8000/api/docs`
 - API OpenAPI JSON: `http://localhost:8000/api/openapi.json`
 - Health: `http://localhost:8000/health`
 
-The optional idempotent dev seed creates `admin / admin`, `gv001 / 123456`, and `sv20210001 / 123456`. For the full project sample database, use `../db/seed/seed.sql` as documented in `../db/README.md`; do not expose sample credentials in production.
+The idempotent dev seed creates `admin / admin`, `gv001 / 123456`, and `sv20210001 / 123456`.
+For the canonical sample data, see `../db/README.md`; do not load both seed sources into the same
+database. Never use sample credentials in production.
 
 ## Tests and migrations
 
@@ -67,7 +69,7 @@ Keep dependencies flowing `controller → service → repository → entity`. Se
 
 All UC001-UC009 business services are fully implemented and verified with automated test coverage:
 - Auth & RBAC (UC001): JWT token lifecycle, bcrypt password hashing, and role-based permissions.
-- Subject and Course Section management (UC002): CRUD operations and room/lecturer schedule conflict checks.
+- Subject and Course Section management (UC002): authenticated catalog reads, admin CRUD operations, and room/lecturer schedule conflict checks.
 - Section Roster (UC003, UC009): Enrolled student listings for lecturers and administrators.
 - Course Registration & Cancellation (UC005, UC006): Per-student row locking (SELECT ... FOR UPDATE), atomic capacity updates, and semester credit limit enforcement. Prerequisite and corequisite checks are excluded.
 - Timetable (UC007, UC008): Weekly schedule calculation for students and lecturers.

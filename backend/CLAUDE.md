@@ -11,5 +11,5 @@
 - All API routes use `/api`; JSON keys are camelCase and errors use the shared FE-BE envelope. Auth returns `accessToken` and a nested `user` object for FE compatibility.
 - Business modules belong in `app/{controller,service,repository,entity,dto}/{auth,catalog,registration,timetable}`; shared configuration and errors belong in `app/core/`, and authentication helpers belong in `app/security/`.
 - Catalog, registration, roster, and timetable business services for UC002-UC009 are fully implemented with automated test coverage. Registration and cancellation enforce credit limits and atomic capacity updates.
-- Run `ruff check .`, `pytest`, `alembic upgrade head`, and `alembic check` from `backend/`. CI also builds and smoke-tests the Compose gateway stack.
+- Run and migration commands are documented in `README.md` and `backend/README.md`; CI also builds and smoke-tests the Compose gateway stack.
 - `contracts/openapi.yaml` and `contracts/api-types.ts` are synchronized with backend routes and schemas.

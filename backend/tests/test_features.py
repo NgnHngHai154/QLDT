@@ -118,6 +118,10 @@ def test_uc005_uc006_student_registration_and_cancel(client, db_session):
     assert sec_res.status_code == 201
     sec_id = sec_res.json()["id"]
 
+    current_sections = client.get("/api/sections", headers=student_headers)
+    assert current_sections.status_code == 200
+    assert any(item["id"] == sec_id for item in current_sections.json()["items"])
+
     # UC005: Sinh viên đăng ký
     reg_res = client.post("/api/registrations", json={"sectionId": sec_id}, headers=student_headers)
     assert reg_res.status_code == 201
@@ -136,6 +140,10 @@ def test_uc005_uc006_student_registration_and_cancel(client, db_session):
     assert my_regs.status_code == 200
     assert len(my_regs.json()["items"]) == 1
 
+    current_regs = client.get("/api/registrations/me", headers=student_headers)
+    assert current_regs.status_code == 200
+    assert len(current_regs.json()["items"]) == 1
+
     # UC007: Xem thời khóa biểu sinh viên
     timetable_res = client.get(
         "/api/students/me/timetable",
@@ -145,6 +153,10 @@ def test_uc005_uc006_student_registration_and_cancel(client, db_session):
     assert timetable_res.status_code == 200
     assert len(timetable_res.json()["items"]) == 1
     assert timetable_res.json()["items"][0]["sectionCode"] == "150005"
+
+    current_student_timetable = client.get("/api/students/me/timetable", headers=student_headers)
+    assert current_student_timetable.status_code == 200
+    assert len(current_student_timetable.json()["items"]) == 1
 
     # UC003 / UC009: Admin và Giảng viên xem danh sách sinh viên lớp này
     gv_headers = login(client, "gv1", "Gv@12345")
@@ -162,6 +174,10 @@ def test_uc005_uc006_student_registration_and_cancel(client, db_session):
     assert lec_timetable.status_code == 200
     assert len(lec_timetable.json()["items"]) == 1
 
+    current_lecturer_timetable = client.get("/api/lecturers/me/timetable", headers=gv_headers)
+    assert current_lecturer_timetable.status_code == 200
+    assert len(current_lecturer_timetable.json()["items"]) == 1
+
     lec_sections = client.get(
         "/api/lecturers/me/sections",
         params={"semesterId": semester.id},
@@ -169,6 +185,10 @@ def test_uc005_uc006_student_registration_and_cancel(client, db_session):
     )
     assert lec_sections.status_code == 200
     assert len(lec_sections.json()["items"]) == 1
+
+    current_lecturer_sections = client.get("/api/lecturers/me/sections", headers=gv_headers)
+    assert current_lecturer_sections.status_code == 200
+    assert len(current_lecturer_sections.json()["items"]) == 1
 
     # UC006: Hủy đăng ký
     del_res = client.delete(f"/api/registrations/{reg_id}", headers=student_headers)

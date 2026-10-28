@@ -20,7 +20,6 @@ from app.dto.catalog.catalog import (
 from app.dto.common import Page, PageParams
 from app.entity.auth.user import Role, User
 from app.entity.catalog.course_section import CourseSection
-from app.entity.catalog.room import Room
 from app.repository.auth.user_repository import LecturerRepository, StudentRepository
 from app.repository.catalog.lookup_repository import LookupRepository
 from app.repository.catalog.section_repository import SectionRepository
@@ -113,7 +112,7 @@ class SectionService:
                 ErrorCode.NOT_FOUND, details=[field_error("lecturerId", "Giảng viên không tồn tại")]
             )
 
-        room = self.db.get(Room, request.room_id)
+        room = self.lookups.get_room_by_id(request.room_id)
         if room is None:
             raise AppError(
                 ErrorCode.NOT_FOUND, details=[field_error("roomId", "Phòng học không tồn tại")]
@@ -210,7 +209,7 @@ class SectionService:
                 ErrorCode.NOT_FOUND, details=[field_error("lecturerId", "Giảng viên không tồn tại")]
             )
 
-        room = self.db.get(Room, request.room_id)
+        room = self.lookups.get_room_by_id(request.room_id)
         if room is None:
             raise AppError(
                 ErrorCode.NOT_FOUND, details=[field_error("roomId", "Phòng học không tồn tại")]

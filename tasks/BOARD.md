@@ -3,7 +3,7 @@
 | Area / UC | Owner | Status | Dependency / Notes |
 |---|---|---|---|
 | FE shell / UC001 | Frontend | Completed | Đăng nhập/xác thực khớp FastAPI `accessToken` và nested `user` |
-| FE UC002 | Frontend | Completed | Tra cứu danh mục môn học và lớp học phần không phân mảnh kỳ, đã gỡ điều kiện tiên quyết/song hành |
+| FE UC002 | Frontend | Completed | Catalog công khai đọc có phân trang từ BE; admin CRUD môn/lớp và chỉnh lịch phân công lưu qua API, không dùng mock |
 | FE UC003/UC009 | Frontend | Completed | Bảng danh sách sinh viên của lớp học phần (`SectionRosterPage`) hiển thị MSSV, họ tên, email, khóa, ngành, thời điểm đăng ký |
 | FE UC005 | Frontend | Completed | Đăng ký học phần theo kỳ hiện tại, xử lý các mã lỗi nghiệp vụ (`CLASS_FULL`, `SAME_SUBJECT_REGISTERED`, `STUDENT_SCHEDULE_CONFLICT`, `CREDIT_LIMIT_EXCEEDED`) |
 | FE UC006 | Frontend | Completed | Hủy đăng ký học phần, cảnh báo nếu dưới ngưỡng tín chỉ tối thiểu (`CREDIT_LIMIT_BELOW_MIN`) |
@@ -15,6 +15,6 @@
 | BE Roster / UC003, UC009 | Backend | Completed | API danh sách sinh viên theo lớp học phần với kiểm tra quyền truy cập |
 | API/OpenAPI | Contracts | Completed | `contracts/openapi.yaml` và `contracts/api-types.ts` đồng bộ với routes và schemas |
 | Database seed | Database | Completed | `db/seed/seed.sql` đã cập nhật 1 kỳ duy nhất (2026.1), 400 lớp học phần thuộc kỳ 2026.1 |
-| CI/CD & Quality | DevOps | Completed | `pytest` (33/33 tests pass), `ruff check .` (100% pass), `tsc && vite build` (100% pass) |
+| CI/CD & Quality | DevOps | Completed | Backend `pytest` và `ruff check .` pass; frontend `npm run build` pass |
 
-Current verification: All backend and frontend checks pass. FE-BE-DB connection is verified.
+Current verification: Catalog public-read, admin CRUD, and timetable updates use canonical API/DTOs. Backend tests/lint, frontend production build, Alembic schema check, and local MySQL 8.4 runtime smoke tests pass. Seed contains 100 subjects and 400 sections; frontend/backend are running locally.

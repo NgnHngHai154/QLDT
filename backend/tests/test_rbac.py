@@ -3,10 +3,16 @@
 from tests.conftest import login
 
 
-def test_student_cannot_call_admin_endpoint(client):
+def test_public_course_catalog_is_readable_without_login(client):
+    res = client.get("/api/subjects")
+    assert res.status_code == 200
+    assert "items" in res.json()
+
+
+def test_student_can_read_course_catalog(client):
     res = client.get("/api/subjects", headers=login(client, "sv1", "Sv@12345"))
-    assert res.status_code == 403
-    assert res.json()["error"] == "FORBIDDEN"
+    assert res.status_code == 200
+    assert "items" in res.json()
 
 
 def test_lecturer_cannot_register(client):

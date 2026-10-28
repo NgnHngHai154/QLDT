@@ -21,7 +21,7 @@ def student_timetable(
     week: int | None = Query(None, ge=1),
 ):
     if semester_id is None:
-        semester_id = SemesterService(db).get_current().semester_id
+        semester_id = SemesterService(db).get_current().id
     return TimetableService(db).student_timetable(user, semester_id, week)
 
 
@@ -35,7 +35,7 @@ def lecturer_timetable(
     week: int | None = Query(None, ge=1),
 ):
     if semester_id is None:
-        semester_id = SemesterService(db).get_current().semester_id
+        semester_id = SemesterService(db).get_current().id
     return TimetableService(db).lecturer_timetable(user, semester_id, week)
 
 
@@ -46,5 +46,5 @@ def lecturer_sections(
     user: LecturerUser, db: DbSession, semester_id: int | None = Query(None, alias="semesterId")
 ):
     if semester_id is None:
-        semester_id = SemesterService(db).get_current().semester_id
+        semester_id = SemesterService(db).get_current().id
     return TimetableService(db).lecturer_sections(user, semester_id)
