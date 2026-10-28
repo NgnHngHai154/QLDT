@@ -277,10 +277,12 @@ class SectionService:
                 )
             raise AppError(ErrorCode.SCHEDULE_CONFLICT, details=conflict_details)
 
-        entity.subject_id = request.subject_id
-        entity.semester_id = request.semester_id
-        entity.lecturer_id = request.lecturer_id
-        entity.room_id = request.room_id
+        # Gán cả quan hệ (không chỉ FK id) để object trả về không bị cũ
+        # (stale) khi session không tự expire/refresh sau khi đổi FK.
+        entity.subject = subject
+        entity.semester = semester
+        entity.lecturer = lecturer
+        entity.room = room
         entity.day_of_week = request.day_of_week
         entity.start_period = request.start_period
         entity.end_period = request.end_period
@@ -289,6 +291,8 @@ class SectionService:
         entity.max_capacity = request.max_capacity
 
         self.db.commit()
+        # Ép nạp lại từ DB trước khi serialize để chắc chắn dữ liệu mới.
+        self.db.expire(entity)
         loaded = self.sections.get_by_id(entity.id)
         return Section.model_validate(loaded)
 
