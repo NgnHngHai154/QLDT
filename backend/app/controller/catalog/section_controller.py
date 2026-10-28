@@ -27,7 +27,7 @@ def list_sections(
     keyword: str | None = None,
 ):
     if semester_id is None:
-        semester_id = SemesterService(db).get_current().semester_id
+        semester_id = SemesterService(db).get_current().id
     return SectionService(db).list(user, semester_id, subject_id, keyword, paging)
 
 

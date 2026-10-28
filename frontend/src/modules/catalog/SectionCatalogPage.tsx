@@ -3,34 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Alert, Button, Card, Empty, Input, Select, Spin, Tag, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import api, { readApiError, requireItems } from "../../shared/api/client";
-
-interface Semester {
-  semesterId: number;
-  semesterCode: string;
-  name: string;
-}
-
-interface CourseSection {
-  sectionId: number;
-  sectionCode: string;
-  subject: {
-    subjectCode: string;
-    name: string;
-    credits: number;
-  };
-  lecturer?: { fullName: string } | null;
-  room?: { roomCode: string } | null;
-  dayOfWeek: number;
-  startPeriod: number;
-  endPeriod: number;
-  startWeek: number;
-  endWeek: number;
-  maxCapacity: number;
-  currentEnrollment: number;
-  remainingSeats: number;
-  full: boolean;
-  registeredByMe: boolean;
-}
+import type { Section, Semester } from "../../shared/api/api-types";
 
 interface ItemsResponse<T> {
   items: T[];
@@ -48,7 +21,7 @@ const days: Record<number, string> = {
   8: "Chủ nhật",
 };
 
-function scheduleLabel(section: CourseSection) {
+function scheduleLabel(section: Section) {
   return `${days[section.dayOfWeek] ?? `Thứ ${section.dayOfWeek}`} · Tiết ${section.startPeriod}-${section.endPeriod} · Tuần ${section.startWeek}-${section.endWeek}`;
 }
 
@@ -67,7 +40,7 @@ export default function SectionCatalogPage() {
 
   useEffect(() => {
     if (semesterId === undefined && semestersQuery.data && semestersQuery.data.length > 0) {
-      setSemesterId(semestersQuery.data[0].semesterId);
+      setSemesterId(semestersQuery.data[0].id);
     }
   }, [semestersQuery.data, semesterId]);
 
@@ -75,10 +48,10 @@ export default function SectionCatalogPage() {
     queryKey: ["sections", semesterId, page],
     enabled: semesterId !== undefined,
     queryFn: async () => {
-      const response = await api.get<ItemsResponse<CourseSection>>("/sections", {
+      const response = await api.get<ItemsResponse<Section>>("/sections", {
         params: { semesterId, page, size: pageSize },
       });
-      return requireItems<CourseSection>(response.data);
+      return requireItems<Section>(response.data);
     },
   });
 
@@ -124,13 +97,13 @@ export default function SectionCatalogPage() {
     );
   }, [search, sectionsQuery.data]);
 
-  function confirmRegistration(section: CourseSection) {
+  function confirmRegistration(section: Section) {
     modal.confirm({
       title: "Xác nhận đăng ký",
       content: `${section.subject.name} · ${section.sectionCode}`,
       okText: "Đăng ký",
       cancelText: "Để sau",
-      onOk: () => registrationMutation.mutateAsync(section.sectionId),
+      onOk: () => registrationMutation.mutateAsync(section.id),
     });
   }
 
@@ -145,7 +118,7 @@ export default function SectionCatalogPage() {
           loading={semestersQuery.isLoading}
           value={semesterId}
           options={(semestersQuery.data ?? []).map((semester) => ({
-            value: semester.semesterId,
+            value: semester.id,
             label: `${semester.semesterCode} · ${semester.name}`,
           }))}
           onChange={(value: number) => {
@@ -180,7 +153,7 @@ export default function SectionCatalogPage() {
 
       <div className="section-grid">
         {visibleSections.map((section) => (
-          <Card key={section.sectionId} className="section-card">
+          <Card key={section.id} className="section-card">
             <div className="section-card-top">
               <span className="section-code">{section.sectionCode}</span>
               <Tag color={section.full ? "error" : "success"}>{section.full ? "Đã đầy" : `Còn ${section.remainingSeats} chỗ`}</Tag>
@@ -200,7 +173,7 @@ export default function SectionCatalogPage() {
                 <Button
                   type="primary"
                   disabled={section.full}
-                  loading={registrationMutation.isPending && registrationMutation.variables === section.sectionId}
+                  loading={registrationMutation.isPending && registrationMutation.variables === section.id}
                   onClick={() => confirmRegistration(section)}
                 >
                   Đăng ký

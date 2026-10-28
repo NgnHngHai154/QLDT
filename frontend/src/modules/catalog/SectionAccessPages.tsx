@@ -3,13 +3,7 @@ import { Alert, Button, Card, Empty, Spin, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
 import api, { requireItems } from "../../shared/api/client";
-
-interface CourseSection {
-  sectionId: number;
-  sectionCode: string;
-  subject: { subjectCode: string; name: string };
-  semester?: { semesterCode: string } | null;
-}
+import type { Section } from "../../shared/api/api-types";
 
 interface SectionStudent {
   id: number;
@@ -37,7 +31,7 @@ export function LecturerSectionsPage() {
   const navigate = useNavigate();
   const sectionsQuery = useQuery({
     queryKey: ["lecturer-sections"],
-    queryFn: async () => requireItems<CourseSection>((await api.get<ItemsResponse<CourseSection>>("/lecturers/me/sections")).data),
+    queryFn: async () => requireItems<Section>((await api.get<ItemsResponse<Section>>("/lecturers/me/sections")).data),
   });
 
   if (sectionsQuery.isLoading) return <div className="feature-loading"><Spin /></div>;
@@ -47,11 +41,11 @@ export function LecturerSectionsPage() {
   return (
     <div className="section-grid">
       {sectionsQuery.data.map((section) => (
-        <Card className="section-card" key={section.sectionId}>
+        <Card className="section-card" key={section.id}>
           <div className="section-card-top"><span className="section-code">{section.sectionCode}</span><Tag color="blue">{section.semester?.semesterCode ?? "2026.1"}</Tag></div>
           <h3>{section.subject.name}</h3>
           <p className="section-subtitle">{section.subject.subjectCode}</p>
-          <Button type="primary" onClick={() => navigate(`/app/sections/${section.sectionId}/students`)}>Danh sách sinh viên</Button>
+          <Button type="primary" onClick={() => navigate(`/app/sections/${section.id}/students`)}>Danh sách sinh viên</Button>
         </Card>
       ))}
     </div>

@@ -2,17 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Empty, InputNumber, Select, Spin } from "antd";
 import api, { readApiError, requireItems, type UserRole } from "../../shared/api/client";
-
-interface Semester {
-  semesterId: number;
-  semesterCode: string;
-  name: string;
-}
-
-interface CurrentSemester {
-  semesterId: number;
-  currentWeek: number;
-}
+import type { CurrentSemester, Semester } from "../../shared/api/api-types";
 
 interface TimetableEntry {
   date: string;
@@ -51,13 +41,13 @@ export default function TimetablePage({ role }: { role: UserRole }) {
   });
 
   useEffect(() => {
-    if (semesterId === undefined && currentSemesterQuery.data?.semesterId !== undefined) {
-      setSemesterId(currentSemesterQuery.data.semesterId);
+    if (semesterId === undefined && currentSemesterQuery.data?.id !== undefined) {
+      setSemesterId(currentSemesterQuery.data.id);
     }
   }, [currentSemesterQuery.data, semesterId]);
 
   useEffect(() => {
-    if (week === undefined && currentSemesterQuery.data?.currentWeek !== undefined) {
+    if (week === undefined && currentSemesterQuery.data?.currentWeek != null) {
       setWeek(currentSemesterQuery.data.currentWeek);
     }
   }, [currentSemesterQuery.data, week]);
@@ -92,7 +82,7 @@ export default function TimetablePage({ role }: { role: UserRole }) {
           placeholder="Chọn học kỳ"
           loading={semestersQuery.isLoading}
           value={semesterId}
-          options={(semestersQuery.data ?? []).map((semester) => ({ value: semester.semesterId, label: `${semester.semesterCode} · ${semester.name}` }))}
+          options={(semestersQuery.data ?? []).map((semester) => ({ value: semester.id, label: `${semester.semesterCode} · ${semester.name}` }))}
           onChange={setSemesterId}
         />
         <div className="week-control">

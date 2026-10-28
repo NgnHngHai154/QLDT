@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Alert, Button, Card, Empty, Select, Spin, Tag, message } from "antd";
 import api, { readApiError, requireItems } from "../../shared/api/client";
-
-interface Semester {
-  semesterId: number;
-  semesterCode: string;
-  name: string;
-}
+import type { Semester } from "../../shared/api/api-types";
 
 interface RegisteredSection {
   sectionId: number;
@@ -47,7 +42,7 @@ export default function MyRegistrationsPage() {
 
   useEffect(() => {
     if (semesterId === undefined && semestersQuery.data && semestersQuery.data.length > 0) {
-      setSemesterId(semestersQuery.data[0].semesterId);
+      setSemesterId(semestersQuery.data[0].id);
     }
   }, [semestersQuery.data, semesterId]);
 
@@ -104,7 +99,7 @@ export default function MyRegistrationsPage() {
           placeholder="Chọn học kỳ"
           loading={semestersQuery.isLoading}
           value={semesterId}
-          options={(semestersQuery.data ?? []).map((semester) => ({ value: semester.semesterId, label: `${semester.semesterCode} · ${semester.name}` }))}
+          options={(semestersQuery.data ?? []).map((semester) => ({ value: semester.id, label: `${semester.semesterCode} · ${semester.name}` }))}
           onChange={setSemesterId}
         />
       </div>
