@@ -2,7 +2,7 @@
 
 Python 3.12 · FastAPI · SQLAlchemy 2 · Alembic · MySQL 8 · JWT + Bcrypt.
 
-The reviewed FE-BE conventions take precedence over older design notes. The canonical SQL schema and seed remain under `../db/`; `contracts/openapi.yaml` is still pending. The generated FastAPI document at `/api/openapi.json` describes the current implementation, not an approved replacement contract.
+The reviewed FE-BE conventions take precedence over older design notes. The canonical SQL schema, seed, and API contract remain under `../db/` and `../contracts/`. The generated FastAPI document at `/api/openapi.json` describes the current implementation.
 
 ## Local run
 
@@ -67,7 +67,7 @@ Keep dependencies flowing `controller → service → repository → entity`. Se
 
 All UC001-UC009 business services are fully implemented and verified with automated test coverage:
 - Auth & RBAC (UC001): JWT token lifecycle, bcrypt password hashing, and role-based permissions.
-- Subject and Course Section management (UC002): CRUD operations and room/lecturer schedule conflict checks.
+- Subject and Course Section management (UC002): authenticated catalog reads, admin CRUD operations, and room/lecturer schedule conflict checks.
 - Section Roster (UC003, UC009): Enrolled student listings for lecturers and administrators.
 - Course Registration & Cancellation (UC005, UC006): Per-student row locking (SELECT ... FOR UPDATE), atomic capacity updates, and semester credit limit enforcement. Prerequisite and corequisite checks are excluded.
 - Timetable (UC007, UC008): Weekly schedule calculation for students and lecturers.

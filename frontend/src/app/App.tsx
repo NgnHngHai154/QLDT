@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import {
   AppstoreOutlined,
   BookOutlined,
@@ -30,13 +30,16 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "../modules/auth/AuthContext";
-import AdminCatalogPage from "../modules/catalog/AdminCatalogPage"; import AdminTimetablePage from "../modules/timetable/AdminTimetablePage";
-import CourseCatalogPage from "../modules/catalog/CourseCatalogPage";
-import { LecturerSectionsPage, SectionRosterPage } from "../modules/catalog/SectionAccessPages";
-import SectionCatalogPage from "../modules/catalog/SectionCatalogPage";
-import MyRegistrationsPage from "../modules/registration/MyRegistrationsPage";
-import TimetablePage from "../modules/timetable/TimetablePage";
 import { readApiError, type UserRole } from "../shared/api/client";
+
+const AdminCatalogPage = lazy(() => import("../modules/catalog/AdminCatalogPage"));
+const AdminTimetablePage = lazy(() => import("../modules/timetable/AdminTimetablePage"));
+const CourseCatalogPage = lazy(() => import("../modules/catalog/CourseCatalogPage"));
+const LecturerSectionsPage = lazy(() => import("../modules/catalog/SectionAccessPages").then((module) => ({ default: module.LecturerSectionsPage })));
+const SectionRosterPage = lazy(() => import("../modules/catalog/SectionAccessPages").then((module) => ({ default: module.SectionRosterPage })));
+const SectionCatalogPage = lazy(() => import("../modules/catalog/SectionCatalogPage"));
+const MyRegistrationsPage = lazy(() => import("../modules/registration/MyRegistrationsPage"));
+const TimetablePage = lazy(() => import("../modules/timetable/TimetablePage"));
 
 const { Content, Header, Sider } = Layout;
 
@@ -236,7 +239,8 @@ function AppRoutes() {
   const { user, loading, authError } = useAuth();
   return (
     <Routes>
-      <Route path="/timetable/manage" element={<AdminTimetablePage />} /> <Route path="/courses" element={<CourseCatalogPage />} />
+      <Route path="/timetable/manage" element={<Navigate to="/app/timetable/manage" replace />} />
+      <Route path="/courses" element={<CourseCatalogPage />} />
       <Route path="/login" element={authError?.status === 403 ? <AccessDenied /> : loading ? <div className="app-loading"><Spin size="large" /></div> : user ? <Navigate to="/app" replace /> : <LoginPage />} />
       <Route path="/app/*" element={<ProtectedApp />} />
       <Route path="/" element={<Navigate to="/courses" replace />} />
@@ -247,10 +251,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: "#a6192e", colorText: "#24282b", colorBorder: "#d9dddf", borderRadius: 3, fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif', controlHeightLG: 46 } }}>
+    <ConfigProvider theme={{ token: { colorPrimary: "#a6192e", colorText: "#24282b", colorTextSecondary: "#68727a", colorBorder: "#e1e5e8", borderRadius: 8, fontFamily: '"Segoe UI", Arial, "Noto Sans", sans-serif', fontSize: 14, controlHeight: 38, controlHeightLG: 46 } }}>
       <AntdApp>
         <BrowserRouter>
-          <AuthProvider><AppRoutes /></AuthProvider>
+          <AuthProvider>
+            <Suspense fallback={<div className="app-loading"><Spin size="large" /></div>}>
+              <AppRoutes />
+            </Suspense>
+          </AuthProvider>
         </BrowserRouter>
       </AntdApp>
     </ConfigProvider>

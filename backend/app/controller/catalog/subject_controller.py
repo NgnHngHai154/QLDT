@@ -11,7 +11,7 @@ router = APIRouter(prefix="/subjects", tags=["catalog"])
 
 
 @router.get("", response_model=Page[Subject], summary="Danh sách môn học")
-def list_subjects(_admin: AdminUser, db: DbSession, paging: Pagination, keyword: str | None = None):
+def list_subjects(db: DbSession, paging: Pagination, keyword: str | None = None):
     return SubjectService(db).list(keyword, paging)
 
 

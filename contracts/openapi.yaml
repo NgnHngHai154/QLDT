@@ -240,8 +240,6 @@ paths:
       - catalog
       summary: Danh sách môn học
       operationId: list_subjects_api_subjects_get
-      security:
-      - HTTPBearer: []
       parameters:
       - name: keyword
         in: query
