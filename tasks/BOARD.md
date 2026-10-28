@@ -15,6 +15,7 @@
 | BE Roster / UC003, UC009 | Backend | Completed | API danh sách sinh viên theo lớp học phần với kiểm tra quyền truy cập |
 | API/OpenAPI | Contracts | Completed | `contracts/openapi.yaml` và `contracts/api-types.ts` đồng bộ với routes và schemas |
 | Database seed | Database | Completed | `db/seed/seed.sql` đã cập nhật 1 kỳ duy nhất (2026.1), 400 lớp học phần thuộc kỳ 2026.1 |
+| Testing / Feature 10 | Testing | Completed | Bộ dữ liệu `seed_test_data`, 16 API tests, 7 integration tests FE–BE–DB, checklist UI cho môn/lớp/roster; hướng dẫn tại `docs/testing/feature10-admin-training.md` |
 | CI/CD & Quality | DevOps | Completed | Backend `pytest` và `ruff check .` pass; frontend `npm run build` pass |
 
 Current verification: Catalog public-read, admin CRUD, and timetable updates use canonical API/DTOs. Backend tests/lint, frontend production build, Alembic schema check, and local MySQL 8.4 runtime smoke tests pass. Seed contains 100 subjects and 400 sections; frontend/backend are running locally.
