@@ -6,13 +6,13 @@ The reviewed FE-BE conventions take precedence over older design notes. The cano
 
 ## Local run
 
-From the repository root, start the MySQL service:
+For the complete local setup and terminal commands, follow the root [README](../README.md). The short backend-only sequence is below. Start MySQL from the repository root:
 
 ```powershell
 docker compose up -d db
 ```
 
-Then, from this directory:
+Then, from `backend/` (create the virtual environment and install dependencies only on first run):
 
 ```powershell
 python -m venv .venv
@@ -23,15 +23,17 @@ python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-Configuration is read from the repository-root `.env` (and then this directory's optional `.env`)
-or process environment. Copy the root `.env.example` to `.env` and set both MySQL passwords plus
-a `JWT_SECRET` of at least 32 characters before running Compose or the API.
+Configuration is read from the repository-root `.env` (then this directory's optional `.env`)
+or process environment. Copy `.env.example` to the repository root as `.env`; set both MySQL
+passwords and a `JWT_SECRET` of at least 32 characters before starting Compose or the API.
 
 - API docs: `http://localhost:8000/api/docs`
 - API OpenAPI JSON: `http://localhost:8000/api/openapi.json`
 - Health: `http://localhost:8000/health`
 
-The optional idempotent dev seed creates `admin / admin`, `gv001 / 123456`, and `sv20210001 / 123456`. For the full project sample database, use `../db/seed/seed.sql` as documented in `../db/README.md`; do not expose sample credentials in production.
+The idempotent dev seed creates `admin / admin`, `gv001 / 123456`, and `sv20210001 / 123456`.
+For the canonical sample data, see `../db/README.md`; do not load both seed sources into the same
+database. Never use sample credentials in production.
 
 ## Tests and migrations
 

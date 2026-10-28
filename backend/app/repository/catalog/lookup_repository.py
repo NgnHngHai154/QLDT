@@ -17,3 +17,6 @@ class LookupRepository(BaseRepository):
 
     def list_rooms(self) -> list[Room]:
         return list(self.db.scalars(select(Room).order_by(Room.room_code)).all())
+
+    def get_room_by_id(self, room_id: int) -> Room | None:
+        return self.db.get(Room, room_id)

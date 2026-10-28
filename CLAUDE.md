@@ -22,22 +22,4 @@ Course registration and academic management system for IT3180. The repository is
 - A 401 clears the session and returns to login. A 403 shows an access error without logging out.
 - Never expose passwords, password hashes, tokens, SQL, or stack traces in UI/logs.
 
-## Commands
-
-```bash
-cd frontend
-npm install
-npm run dev
-npm run build
-```
-
-Backend checks:
-
-```powershell
-cd backend
-pip install -r requirements-dev.txt
-ruff check .
-pytest
-```
-
-See `backend/CLAUDE.md`, `frontend/CLAUDE.md`, and `README.md` for component setup and current status.
+Run/setup commands live in `README.md`; backend/frontend-specific architecture rules live in their respective `CLAUDE.md` files.

@@ -1,5 +1,7 @@
 # Quy ước API FE-BE
 
+Resource objects (subject, section, semester) expose `id` in responses; `subjectId`, `sectionId`, and `semesterId` are request references/query parameters. Keep frontend types aligned with `contracts/api-types.ts`.
+
 Quy ước này được cập nhật sau tài liệu thiết kế và được ưu tiên khi có mâu thuẫn. `contracts/openapi.yaml` là nguồn schema cuối cùng trong repository.
 
 ## JSON và HTTP

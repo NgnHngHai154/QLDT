@@ -1,62 +1,22 @@
-# QLDT | Quản lý & Đăng ký Học phần Trực tuyến
+# QLDT — Quản lý và đăng ký học phần
 
-Bài tập lớn IT3180 của Nhóm 20, Trường CNTT&TT, Đại học Bách khoa Hà Nội.
+Dự án môn IT3180, Nhóm 20. Stack: React + TypeScript, FastAPI, MySQL.
 
-## Frontend
+## Chạy FE–BE–DB local (Windows)
 
-Yêu cầu Node.js 20 trở lên và npm.
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Mở URL Vite hiển thị trong terminal. Kiểm tra production build bằng `npm run build`.
-Tạo `frontend/.env.local` nếu cần đổi API origin:
-
-```dotenv
-VITE_API_BASE_URL=/api
-```
-
-## Chuẩn bị sau khi clone
-
-Tạo file cấu hình ở thư mục gốc trước khi chạy Compose hoặc backend:
+Yêu cầu Docker Desktop, Python 3.12+, Node.js 20+ và npm. Tại thư mục gốc, tạo cấu hình một lần:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Thay các giá trị mẫu trong `.env`, đặc biệt là mật khẩu MySQL và `JWT_SECRET`. Tạo virtual
-environment và cài dependency backend (dùng `requirements-dev.txt` nếu cần chạy test):
-
-```powershell
-cd backend
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-# Nếu cần chạy test, dùng thay thế: pip install -r requirements-dev.txt
-```
-
-| Key | Mô tả |
-|---|---|
-| `MYSQL_DATABASE` | Tên database; mặc định `qldt`. |
-| `MYSQL_USER` | Tài khoản MySQL cho ứng dụng; mặc định `app`. |
-| `MYSQL_PASSWORD` | Mật khẩu tài khoản ứng dụng; bắt buộc, cần thay giá trị mẫu. |
-| `MYSQL_ROOT_PASSWORD` | Mật khẩu root MySQL; bắt buộc, cần thay giá trị mẫu. |
-| `JWT_SECRET` | Bí mật ký JWT; bắt buộc và tối thiểu 32 ký tự. |
-| `MIN_CREDITS_PER_SEMESTER` | Số tín chỉ tối thiểu; mặc định tạm thời `12`. |
-| `MAX_CREDITS_PER_SEMESTER` | Số tín chỉ tối đa; mặc định tạm thời `24`, phải >= 1 và >= mức tối thiểu. |
-
-## Backend API
-
-Yêu cầu Python 3.12 trở lên và MySQL 8.0.16 trở lên. Từ thư mục gốc, khởi động MySQL:
+Thay `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD` và `JWT_SECRET` trong `.env` (JWT tối thiểu 32 ký tự). Chạy MySQL:
 
 ```powershell
 docker compose up -d db
 ```
 
-Sau đó cài và khởi động API:
+Mở terminal thứ hai để chạy backend:
 
 ```powershell
 cd backend
@@ -68,39 +28,32 @@ python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
-API docs: `http://localhost:8000/api/docs`; health: `http://localhost:8000/health`.
-Backend đọc cấu hình từ biến môi trường và file `.env` ở thư mục gốc; không dùng giá trị mẫu ở production.
-Kiểm thử bằng `pytest` và `ruff check .` từ thư mục `backend/`.
-
-Toàn bộ dịch vụ nghiệp vụ UC001-UC009 (xác thực, danh mục môn/lớp, đăng ký/hủy, thời khóa biểu, danh sách sinh viên) đã hoàn thiện và có kiểm thử tự động. Hệ thống vận hành trên 1 kỳ đăng ký duy nhất và đã loại bỏ điều kiện môn tiên quyết/song hành. Xem trạng thái chi tiết tại [backend/README.md](backend/README.md) và [tasks/BOARD.md](tasks/BOARD.md).
-
-## Toàn bộ stack Docker
-
-Từ thư mục gốc:
+Mở terminal thứ ba để chạy frontend:
 
 ```powershell
-docker compose up -d --build db
-docker compose run --rm backend alembic upgrade head
-docker compose run --rm backend python -m scripts.seed
-docker compose up -d --build backend gateway
+cd frontend
+npm install
+npm run dev
 ```
 
-Gateway: `http://localhost:8080`; Swagger UI: `http://localhost:8080/api/docs`.
-Deployment production và các secret được mô tả trong [docker-compose.prod.yml](docker-compose.prod.yml)
-và workflow [CI/CD](.github/workflows/ci-cd.yml). Deploy qua SSH được tắt mặc định.
+Vite chạy tại `http://localhost:5173`, proxy `/api` tới backend `http://localhost:8000`. API docs: `http://localhost:8000/api/docs`; health: `http://localhost:8000/health`.
 
-## Cấu trúc repository
+Seed dev tạo tài khoản `admin / admin`, `gv001 / 123456`, `sv20210001 / 123456`. Chỉ dùng các mật khẩu mẫu ở môi trường local.
 
-- [docs/00-INDEX.md](docs/00-INDEX.md): bản đồ và nguồn tài liệu dự án.
-- `contracts/`: hợp đồng API; `contracts/openapi.yaml` chưa được cung cấp.
-- `backend/`: FastAPI, SQLAlchemy, Alembic, tests và seed tiện ích dev.
-- `frontend/`: React + TypeScript + Vite.
-- `db/`: SQL schema và seed chuẩn; tên database `qldt`.
-- `gateway/`: reverse proxy Nginx và smoke test.
-- `docker-compose.yml`, `docker-compose.prod.yml`: cấu hình local và production.
-- `.github/workflows/ci-cd.yml`: lint, tests, migration checks, container integration, image publish; deployment SSH tùy chọn.
-- `e2e/`, `tasks/`, `scripts/`: vùng test/workflow và theo dõi công việc.
+## Chạy kiểm tra
 
-## Trạng thái
+```powershell
+# backend (trong backend/ và đã activate .venv)
+ruff check .
+pytest
 
-Tiến độ, phần còn thiếu và trạng thái kiểm thử được theo dõi tại [tasks/BOARD.md](tasks/BOARD.md).
+# frontend (trong frontend/)
+npm run build
+```
+
+## Nguồn dữ liệu và hợp đồng
+
+- `db/schema.sql` và `db/seed/seed.sql` là schema/seed SQL chuẩn; xem [db/README.md](db/README.md). Không nạp SQL seed lên database đã có dữ liệu nếu chưa xác nhận tác động.
+- Hợp đồng FE–BE nằm tại `contracts/openapi.yaml` và `contracts/api-types.ts`. JSON dùng camelCase; object môn/lớp/học kỳ trả `id`, còn request tham chiếu dùng `subjectId`, `sectionId`, `semesterId`.
+- Backend theo luồng `controller → service → repository → entity`; nghiệp vụ đăng ký, xung đột và sĩ số do server quản lý.
+- [backend/README.md](backend/README.md) và [frontend/README.md](frontend/README.md) có ghi chú riêng cho từng ứng dụng.

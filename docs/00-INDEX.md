@@ -12,7 +12,7 @@ Start here and read only the material needed for the task.
 | Database or backend | `../backend/CLAUDE.md`, `../backend/README.md`, `specs/design/`, `../db/README.md`, `../db/schema.sql` |
 | Frontend implementation | `../frontend/CLAUDE.md`, UC files, API conventions, `traceability.md` |
 | Current work/status | `../tasks/BOARD.md` |
-| Local deployment and CI/CD | `../docker-compose.yml`, `../gateway/README.md`, `../.github/workflows/ci-cd.yml` |
+| Local setup, deployment, and CI/CD | `../README.md`, `../docker-compose.yml`, `../gateway/README.md`, `../.github/workflows/ci-cd.yml` |
 
 ## Authority
 

@@ -9,4 +9,4 @@
 - Parse API failures using `error`, not `message`. Map `VALIDATION_ERROR` details to fields.
 - Never calculate or optimistically mutate enrollment counts. Refetch after successful writes.
 - 401 clears session; 403 does not log out. Route visibility is UX only; the server enforces RBAC.
-- Run `npm run build` before handing off. Add focused tests with the module implementation.
+- Build and local-run commands are documented in `README.md` and `frontend/README.md`. Add focused tests with module changes.
