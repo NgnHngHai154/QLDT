@@ -48,6 +48,8 @@ alembic check
 
 Pytest uses an in-memory SQLite database and does not require MySQL. Migration commands require a MySQL database at `DATABASE_URL`; CI runs them against MySQL 8.4. ORM and Alembic table names stay uppercase to match `db/schema.sql` on case-sensitive MySQL hosts.
 
+Feature 10 adds `tests/test_admin_training.py` and opt-in integration tests in `tests/integration/`. Seed the deterministic dataset with `python -m scripts.seed_test_data`, then run `pytest -m integration` while MySQL, gateway, and frontend are running. Full instructions are in [../docs/testing/feature10-admin-training.md](../docs/testing/feature10-admin-training.md).
+
 When changing entities, create and review a migration with `alembic revision --autogenerate -m "describe change"`, then verify `alembic upgrade head` and `alembic check`.
 
 ## Architecture

@@ -51,6 +51,20 @@ pytest
 npm run build
 ```
 
+## Kiểm thử quản trị đào tạo (Feature 10)
+
+Sau khi chạy migration và `python -m scripts.seed`, nạp bộ dữ liệu thử nghiệm:
+
+```powershell
+cd backend
+python -m scripts.seed_test_data
+pytest
+pytest -m integration
+```
+
+`pytest -m integration` cần MySQL, gateway và frontend đang chạy; xem hướng dẫn đầy đủ,
+bảng dữ liệu và checklist giao diện tại [docs/testing/feature10-admin-training.md](docs/testing/feature10-admin-training.md).
+
 ## Nguồn dữ liệu và hợp đồng
 
 - `db/schema.sql` và `db/seed/seed.sql` là schema/seed SQL chuẩn; xem [db/README.md](db/README.md). Không nạp SQL seed lên database đã có dữ liệu nếu chưa xác nhận tác động.
