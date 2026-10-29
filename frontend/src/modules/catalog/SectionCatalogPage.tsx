@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Alert, Button, Card, Empty, Input, Select, Spin, Tag, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import api, { readApiError, requireItems } from "../../shared/api/client";
 import type { Section, Semester } from "../../shared/api/api-types";
+import { fetchSections } from "./catalogApi";
 
 interface ItemsResponse<T> {
   items: T[];
@@ -45,15 +46,17 @@ export default function SectionCatalogPage() {
   }, [semestersQuery.data, semesterId]);
 
   const sectionsQuery = useQuery({
-    queryKey: ["sections", semesterId, page],
+    queryKey: ["sections", semesterId, page, search],
     enabled: semesterId !== undefined,
-    queryFn: async () => {
-      const response = await api.get<ItemsResponse<Section>>("/sections", {
-        params: { semesterId, page, size: pageSize },
-      });
-      return requireItems<Section>(response.data);
-    },
+    queryFn: () =>
+      fetchSections({
+        semesterId: semesterId!,
+        page,
+        size: pageSize,
+        keyword: search.trim() || undefined,
+      }),
   });
+  const sections = sectionsQuery.data?.items ?? [];
 
   const registrationMutation = useMutation({
     mutationFn: (sectionId: number) => api.post("/registrations", { sectionId }),
@@ -86,16 +89,6 @@ export default function SectionCatalogPage() {
       void queryClient.invalidateQueries({ queryKey: ["sections", semesterId] });
     },
   });
-
-  const visibleSections = useMemo(() => {
-    const normalizedSearch = search.trim().toLocaleLowerCase("vi-VN");
-    if (!normalizedSearch) return sectionsQuery.data ?? [];
-    return (sectionsQuery.data ?? []).filter((section) =>
-      `${section.sectionCode} ${section.subject.subjectCode} ${section.subject.name}`
-        .toLocaleLowerCase("vi-VN")
-        .includes(normalizedSearch),
-    );
-  }, [search, sectionsQuery.data]);
 
   function confirmRegistration(section: Section) {
     modal.confirm({
@@ -133,7 +126,10 @@ export default function SectionCatalogPage() {
           placeholder="Tìm theo mã lớp hoặc môn học"
           prefix={<SearchOutlined />}
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
         />
       </div>
 
@@ -147,12 +143,12 @@ export default function SectionCatalogPage() {
       {sectionsQuery.isError && (
         <Alert type="error" showIcon message="Không tải được lớp học phần." action={<Button size="small" onClick={() => void sectionsQuery.refetch()}>Thử lại</Button>} />
       )}
-      {semesterId !== undefined && !sectionsQuery.isLoading && !sectionsQuery.isError && visibleSections.length === 0 && (
-        <div className="feature-empty"><Empty description={search ? "Không tìm thấy lớp phù hợp." : "Học kỳ này chưa có lớp học phần."} /></div>
+      {semesterId !== undefined && !sectionsQuery.isLoading && !sectionsQuery.isError && sections.length === 0 && (
+        <div className="feature-empty"><Empty description={search.trim() ? "Không tìm thấy lớp phù hợp." : "Học kỳ này chưa có lớp học phần."} /></div>
       )}
 
       <div className="section-grid">
-        {visibleSections.map((section) => (
+        {sections.map((section) => (
           <Card key={section.id} className="section-card">
             <div className="section-card-top">
               <span className="section-code">{section.sectionCode}</span>
@@ -184,11 +180,11 @@ export default function SectionCatalogPage() {
         ))}
       </div>
 
-      {semesterId !== undefined && (sectionsQuery.data?.length ?? 0) > 0 && (
+      {semesterId !== undefined && (sectionsQuery.data?.totalItems ?? 0) > 0 && (
         <div className="feature-pagination">
-          <Button disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Trước</Button>
-          <span>Trang {page}</span>
-          <Button disabled={(sectionsQuery.data?.length ?? 0) < pageSize} onClick={() => setPage((value) => value + 1)}>Tiếp</Button>
+          <Button disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Trước</Button>
+          <span>Trang {page}/{sectionsQuery.data?.totalPages ?? 1} · Tổng {sectionsQuery.data?.totalItems ?? 0} lớp</span>
+          <Button disabled={page >= (sectionsQuery.data?.totalPages ?? 1)} onClick={() => setPage((value) => value + 1)}>Tiếp</Button>
         </div>
       )}
     </>
