@@ -5,8 +5,8 @@
 | FE shell / UC001 | Frontend | Completed | Đăng nhập/xác thực khớp FastAPI `accessToken` và nested `user` |
 | FE UC002 | Frontend | Completed | Catalog công khai đọc có phân trang từ BE; admin CRUD môn/lớp và chỉnh lịch phân công lưu qua API, không dùng mock |
 | FE UC003/UC009 | Frontend | Completed | Bảng danh sách sinh viên của lớp học phần (`SectionRosterPage`) hiển thị MSSV, họ tên, email, khóa, ngành, thời điểm đăng ký |
-| FE UC005 | Frontend | Completed | Đăng ký học phần theo kỳ hiện tại, xử lý các mã lỗi nghiệp vụ (`CLASS_FULL`, `SAME_SUBJECT_REGISTERED`, `STUDENT_SCHEDULE_CONFLICT`, `CREDIT_LIMIT_EXCEEDED`) |
-| FE UC006 | Frontend | Completed | Hủy đăng ký học phần, cảnh báo nếu dưới ngưỡng tín chỉ tối thiểu (`CREDIT_LIMIT_BELOW_MIN`) |
+| FE UC005 | Frontend | Completed | `/app/sections` có tìm kiếm/bộ lọc nâng cao, giỏ LocalStorage theo sinh viên, gửi đăng ký tuần tự qua POST hiện có, tổng tín chỉ và TKB dự kiến Thứ 2–Thứ 7/tiết 1–12; xử lý lỗi server và refetch |
+| FE UC006 | Frontend | Completed | Hủy theo `Registration.id` đúng contract `/registrations/{registration_id}`, hiển thị `details[]`/lỗi điều kiện tín chỉ; trang lớp đã đăng ký có summary 12–24 TC |
 | FE UC007/UC008 | Frontend | Completed | Thời khóa biểu tuần cho sinh viên và lịch giảng dạy cho giảng viên, tự động theo kỳ duy nhất |
 | BE Auth / UC001 | Backend | Completed | FastAPI auth JWT, kiểm tra mật khẩu bcrypt, RBAC đầy đủ |
 | BE Catalog / UC002 | Backend | Completed | CRUD môn học và lớp học phần, kiểm tra trùng lịch phòng/giảng viên |
@@ -18,6 +18,6 @@
 | API/OpenAPI | Contracts | Completed | `contracts/openapi.yaml` và `contracts/api-types.ts` bao gồm routes/DTO thời khóa biểu và học phí |
 | Database seed | Database | Completed | `db/seed/seed.sql` đã cập nhật 1 kỳ duy nhất (2026.1), 400 lớp học phần thuộc kỳ 2026.1 |
 | Testing / Feature 10 + Tuition | Testing | Completed | Backend suite: 66 passed, 7 integration tests skipped; thêm API, PDF, tính học phí và conflict tests |
-| CI/CD & Quality | DevOps | Completed | Backend pytest/Ruff pass; Alembic upgrade/check trên SQLite pass; frontend không thuộc phạm vi thay đổi |
+| CI/CD & Quality | DevOps | Completed | Backend pytest/Ruff và Alembic schema check pass; frontend production build/type-check pass theo cập nhật nhánh main |
 
-Current verification: 66 backend tests pass, 7 MySQL/gateway/frontend integration tests remain skipped by default, Ruff passes, Alembic upgrade/check and legacy-rate backfill pass on SQLite, and Compose configuration is valid. OpenAPI paths and schema references match the runtime app. Frontend was not modified or rebuilt; MySQL concurrency and PDF rendering inside Docker remain unverified.
+Current verification: 66 backend tests pass; 7 MySQL/gateway/frontend integration tests remain skipped by default. Ruff, SQLite Alembic upgrade/schema check and legacy-rate backfill pass; Compose configuration and OpenAPI paths/schema references are valid. Frontend registration filters/cart/batch submission/cancellation and timetable preview are recorded from the main-branch update; frontend production build/type-check also passed there. This feature branch did not modify frontend files. MySQL concurrency and PDF rendering inside Docker remain unverified.
