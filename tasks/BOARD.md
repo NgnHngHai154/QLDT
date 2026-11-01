@@ -12,10 +12,12 @@
 | BE Catalog / UC002 | Backend | Completed | CRUD môn học và lớp học phần, kiểm tra trùng lịch phòng/giảng viên |
 | BE Registration / UC005, UC006 | Backend | Completed | Đăng ký/hủy học phần, khóa dòng học sinh FOR UPDATE, tính tín chỉ theo kỳ, cập nhật sĩ số nguyên tử |
 | BE Timetable / UC007, UC008 | Backend | Completed | API thời khóa biểu sinh viên & lịch dạy giảng viên, tự động nhận diện tuần học |
+| BE Timetable conflicts | Backend | Completed | Engine chung phân loại xung đột sinh viên/phòng/giảng viên theo tiết và tuần giao nhau; cập nhật lớp trả chi tiết sinh viên bị ảnh hưởng |
+| BE Tuition & receipts | Backend | Completed | Đơn giá hiệu lực, TCHP, miễn giảm, đợt nộp, hóa đơn, thanh toán giả lập idempotent, snapshot biên lai và PDF |
 | BE Roster / UC003, UC009 | Backend | Completed | API danh sách sinh viên theo lớp học phần với kiểm tra quyền truy cập |
-| API/OpenAPI | Contracts | Completed | `contracts/openapi.yaml` và `contracts/api-types.ts` đồng bộ với routes và schemas |
+| API/OpenAPI | Contracts | Completed | `contracts/openapi.yaml` và `contracts/api-types.ts` bao gồm routes/DTO thời khóa biểu và học phí |
 | Database seed | Database | Completed | `db/seed/seed.sql` đã cập nhật 1 kỳ duy nhất (2026.1), 400 lớp học phần thuộc kỳ 2026.1 |
-| Testing / Feature 10 | Testing | Completed | Bộ dữ liệu `seed_test_data`, 16 API tests, 7 integration tests FE–BE–DB, checklist UI cho môn/lớp/roster; hướng dẫn tại `docs/testing/feature10-admin-training.md` |
-| CI/CD & Quality | DevOps | Completed | Backend `pytest` và `ruff check .` pass; frontend `npm run build` pass |
+| Testing / Feature 10 + Tuition | Testing | Completed | Backend suite: 66 passed, 7 integration tests skipped; thêm API, PDF, tính học phí và conflict tests |
+| CI/CD & Quality | DevOps | Completed | Backend pytest/Ruff pass; Alembic upgrade/check trên SQLite pass; frontend không thuộc phạm vi thay đổi |
 
-Current verification: Catalog public-read, admin CRUD, and timetable updates use canonical API/DTOs. Backend tests/lint, frontend production build, Alembic schema check, and local MySQL 8.4 runtime smoke tests pass. Seed contains 100 subjects and 400 sections; frontend/backend are running locally.
+Current verification: 66 backend tests pass, 7 MySQL/gateway/frontend integration tests remain skipped by default, Ruff passes, Alembic upgrade/check and legacy-rate backfill pass on SQLite, and Compose configuration is valid. OpenAPI paths and schema references match the runtime app. Frontend was not modified or rebuilt; MySQL concurrency and PDF rendering inside Docker remain unverified.
