@@ -62,10 +62,7 @@ def calculate_installments(
         return []
 
     if amount_due <= 0:
-        return [
-            {**spec, "allocatedAmount": 0}
-            for spec in installment_specs
-        ]
+        return [{**spec, "allocatedAmount": 0} for spec in installment_specs]
 
     modes = {
         "percentage" if spec.get("percentage") is not None else "fixed"

@@ -92,9 +92,7 @@ def _tuition_world(db_session):
     }
 
 
-def test_student_payment_is_idempotent_and_receipt_pdf_is_available(
-    client, db_session
-):
+def test_student_payment_is_idempotent_and_receipt_pdf_is_available(client, db_session):
     world = _tuition_world(db_session)
     student_headers = login(client, "sv1", "Sv@12345")
     invoice_response = client.get(
@@ -114,16 +112,12 @@ def test_student_payment_is_idempotent_and_receipt_pdf_is_available(
     )
     assert payment_response.status_code == 201, payment_response.text
     receipt = payment_response.json()
-    repeated = client.post(
-        "/api/tuition/me/payments", json=payment_body, headers=student_headers
-    )
+    repeated = client.post("/api/tuition/me/payments", json=payment_body, headers=student_headers)
     assert repeated.status_code == 201
     assert repeated.json()["id"] == receipt["id"]
     assert repeated.json()["receiptNo"] == receipt["receiptNo"]
 
-    pdf_response = client.get(
-        f"/api/receipts/{receipt['id']}/pdf", headers=student_headers
-    )
+    pdf_response = client.get(f"/api/receipts/{receipt['id']}/pdf", headers=student_headers)
     assert pdf_response.status_code == 200
     assert pdf_response.headers["content-type"] == "application/pdf"
     assert receipt["receiptNo"].encode() in pdf_response.content
@@ -181,23 +175,26 @@ def test_tuition_permissions_and_payment_limits(client, db_session):
     db_session.add(student2)
     db_session.commit()
     student2_headers = login(client, "sv2", "Sv2@12345")
-    foreign_receipt = client.get(
-        f"/api/receipts/{paid.json()['id']}", headers=student2_headers
-    )
+    foreign_receipt = client.get(f"/api/receipts/{paid.json()['id']}", headers=student2_headers)
     assert foreign_receipt.status_code == 403
-    assert client.get(
-        f"/api/receipts/{paid.json()['id']}", headers=lecturer_headers
-    ).status_code == 403
-    assert client.get(
-        f"/api/receipts/{paid.json()['id']}", headers=student_headers
-    ).status_code == 200
-    assert client.get(
-        "/api/admin/tuition/invoices?semesterId=1", headers=lecturer_headers
-    ).status_code == 403
-    assert client.get(
-        f"/api/admin/tuition/invoices?semesterId={world['semester'].id}",
-        headers=admin_headers,
-    ).status_code == 200
+    assert (
+        client.get(f"/api/receipts/{paid.json()['id']}", headers=lecturer_headers).status_code
+        == 403
+    )
+    assert (
+        client.get(f"/api/receipts/{paid.json()['id']}", headers=student_headers).status_code == 200
+    )
+    assert (
+        client.get("/api/admin/tuition/invoices?semesterId=1", headers=lecturer_headers).status_code
+        == 403
+    )
+    assert (
+        client.get(
+            f"/api/admin/tuition/invoices?semesterId={world['semester'].id}",
+            headers=admin_headers,
+        ).status_code
+        == 200
+    )
 
 
 def test_discount_excess_rejected_and_installment_reconfiguration_after_payment_blocked(

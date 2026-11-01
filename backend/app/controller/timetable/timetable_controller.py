@@ -149,10 +149,7 @@ def student_timetable_suggestions(
         return {"items": suggestions}
 
     raw_sections = (
-        payload_dict.get("sections")
-        or payload_dict.get("items")
-        or payload_dict.get("slots")
-        or []
+        payload_dict.get("sections") or payload_dict.get("items") or payload_dict.get("slots") or []
     )
     return {
         "items": suggest_timetables(

@@ -347,9 +347,7 @@ class SectionService:
                             for conflict in slot_conflicts
                         )
                 if student_conflict_details:
-                    raise AppError(
-                        ErrorCode.SCHEDULE_CONFLICT, details=student_conflict_details
-                    )
+                    raise AppError(ErrorCode.SCHEDULE_CONFLICT, details=student_conflict_details)
 
         # Gán cả quan hệ (không chỉ FK id) để object trả về không bị cũ
         # (stale) khi session không tự expire/refresh sau khi đổi FK.

@@ -22,7 +22,9 @@ class TuitionInstallment(Base):
             "percentage IS NULL OR (percentage >= 0 AND percentage <= 100)",
             name="percentage_range",
         ),
-        CheckConstraint("fixed_amount IS NULL OR fixed_amount >= 0", name="fixed_amount_non_negative"),
+        CheckConstraint(
+            "fixed_amount IS NULL OR fixed_amount >= 0", name="fixed_amount_non_negative"
+        ),
     )
 
     id: Mapped[int] = mapped_column("installment_id", BigInt, primary_key=True, autoincrement=True)

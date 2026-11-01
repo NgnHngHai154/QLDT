@@ -79,8 +79,10 @@ def _text(value: Any) -> str:
 
 def _logo_flowable() -> Any:
     configured = settings.receipt_logo_path
-    logo_path = Path(configured) if configured else (
-        Path(__file__).resolve().parents[2] / "assets" / "logo.png"
+    logo_path = (
+        Path(configured)
+        if configured
+        else (Path(__file__).resolve().parents[2] / "assets" / "logo.png")
     )
     if logo_path.is_file():
         return Image(str(logo_path), width=25 * mm, height=18 * mm, kind="proportional")
@@ -158,10 +160,15 @@ def render_receipt_pdf(receipt: dict[str, Any]) -> bytes:
     )
     story: list[Any] = [
         Table(
-            [[_logo_flowable(), Paragraph(
-                "<b>ĐẠI HỌC BÁCH KHOA HÀ NỘI</b><br/>BỘ PHẬN THU HỌC PHÍ",
-                styles["ReceiptBody"],
-            )]],
+            [
+                [
+                    _logo_flowable(),
+                    Paragraph(
+                        "<b>ĐẠI HỌC BÁCH KHOA HÀ NỘI</b><br/>BỘ PHẬN THU HỌC PHÍ",
+                        styles["ReceiptBody"],
+                    ),
+                ]
+            ],
             colWidths=[35 * mm, 135 * mm],
             style=TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE")]),
         ),
@@ -171,12 +178,12 @@ def render_receipt_pdf(receipt: dict[str, Any]) -> bytes:
         Paragraph(f"Số biên lai: <b>{_text(data['receiptNo'])}</b>", styles["ReceiptBody"]),
         Paragraph(f"Ngày giờ: {_text(receipt['issuedAt'])}", styles["ReceiptBody"]),
         Paragraph(
-        f"Sinh viên: <b>{_text(data['fullName'])}</b> · MSSV: {_text(data['studentCode'])}",
+            f"Sinh viên: <b>{_text(data['fullName'])}</b> · MSSV: {_text(data['studentCode'])}",
             styles["ReceiptBody"],
         ),
         Paragraph(
-        f"Khóa/ngành: {_text(data['cohort'])} / {_text(data['major'])} · "
-        f"Học kỳ: {_text(data['semesterCode'])} - {_text(data['semesterName'])}",
+            f"Khóa/ngành: {_text(data['cohort'])} / {_text(data['major'])} · "
+            f"Học kỳ: {_text(data['semesterCode'])} - {_text(data['semesterName'])}",
             styles["ReceiptBody"],
         ),
         Spacer(1, 3 * mm),
@@ -223,7 +230,9 @@ def render_receipt_pdf(receipt: dict[str, Any]) -> bytes:
             Paragraph(f"Tổng học phí: {_money(data['totalTuition'])}", styles["ReceiptRight"]),
             Paragraph(f"Miễn giảm: {_money(data['totalDiscount'])}", styles["ReceiptRight"]),
             Paragraph(f"Số phải nộp: {_money(data['amountDue'])}", styles["ReceiptRight"]),
-            Paragraph(f"Số tiền đợt này: <b>{_money(data['paymentAmount'])}</b>", styles["ReceiptRight"]),
+            Paragraph(
+                f"Số tiền đợt này: <b>{_money(data['paymentAmount'])}</b>", styles["ReceiptRight"]
+            ),
             Paragraph(f"Đã nộp lũy kế: {_money(data['cumulativePaid'])}", styles["ReceiptRight"]),
             Paragraph(f"Còn lại: {_money(data['balanceRemaining'])}", styles["ReceiptRight"]),
             Paragraph(

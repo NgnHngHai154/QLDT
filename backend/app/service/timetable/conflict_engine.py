@@ -73,16 +73,13 @@ def find_conflicts(slots: Iterable[Any]) -> list[dict[str, Any]]:
             left_label = _read(left, "sectionCode", "section_code", "code", "name") or "A"
             right_label = _read(right, "sectionCode", "section_code", "code", "name") or "B"
             conflict_types: list[str] = []
-            if (
-                _read(left, "roomId", "room_id") is not None
-                and _read(left, "roomId", "room_id") == _read(right, "roomId", "room_id")
-            ):
+            if _read(left, "roomId", "room_id") is not None and _read(
+                left, "roomId", "room_id"
+            ) == _read(right, "roomId", "room_id"):
                 conflict_types.append("ROOM")
-            if (
-                _read(left, "lecturerId", "lecturer_id") is not None
-                and _read(left, "lecturerId", "lecturer_id")
-                == _read(right, "lecturerId", "lecturer_id")
-            ):
+            if _read(left, "lecturerId", "lecturer_id") is not None and _read(
+                left, "lecturerId", "lecturer_id"
+            ) == _read(right, "lecturerId", "lecturer_id"):
                 conflict_types.append("LECTURER")
             if not conflict_types:
                 conflict_types.append("STUDENT")

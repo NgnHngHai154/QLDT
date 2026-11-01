@@ -425,7 +425,9 @@ class TuitionService:
         return items, total
 
     @staticmethod
-    def _calculate_discount(total_tuition: int, discounts: list[TuitionDiscount]) -> tuple[int, int]:
+    def _calculate_discount(
+        total_tuition: int, discounts: list[TuitionDiscount]
+    ) -> tuple[int, int]:
         percent = sum((discount.discount_percent for discount in discounts), Decimal("0"))
         fixed_amount = sum(discount.fixed_amount for discount in discounts)
         percent_discount = int(Decimal(total_tuition) * percent / Decimal("100"))
@@ -530,9 +532,7 @@ class TuitionService:
         )
 
     # ==================== STUDENT TUITION VIEW ====================
-    def get_student_tuition(
-        self, user: User, semester_id: int | None = None
-    ) -> TuitionInvoiceDto:
+    def get_student_tuition(self, user: User, semester_id: int | None = None) -> TuitionInvoiceDto:
         student = self.students.get_by_user_id(user.id)
         if student is None:
             raise AppError(ErrorCode.FORBIDDEN)
@@ -609,9 +609,7 @@ class TuitionService:
 
         today = today_vn()
         lump_sum_paid = sum(
-            payment.amount
-            for payment in invoice.payments
-            if payment.installment_id is None
+            payment.amount for payment in invoice.payments if payment.installment_id is None
         )
         direct_paid = {
             installment.id: sum(
@@ -779,9 +777,7 @@ class TuitionService:
             )
             if allocation is None:
                 raise AppError(ErrorCode.VALIDATION_ERROR)
-            paid_for_installment = self.repo.paid_amount_for_installment(
-                invoice.id, installment.id
-            )
+            paid_for_installment = self.repo.paid_amount_for_installment(invoice.id, installment.id)
             if request.amount > allocation - paid_for_installment:
                 raise AppError(
                     ErrorCode.PAYMENT_EXCEEDS_BALANCE,
@@ -889,9 +885,7 @@ class TuitionService:
         )
 
     # ==================== RECEIPTS QUERIES ====================
-    def list_student_receipts(
-        self, user: User, semester_id: int | None = None
-    ) -> list[ReceiptDto]:
+    def list_student_receipts(self, user: User, semester_id: int | None = None) -> list[ReceiptDto]:
         student = self.students.get_by_user_id(user.id)
         if student is None:
             raise AppError(ErrorCode.FORBIDDEN)

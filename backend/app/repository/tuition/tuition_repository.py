@@ -21,9 +21,7 @@ from app.repository.base import BaseRepository
 
 class TuitionRepository(BaseRepository):
     def lock_semester(self, semester_id: int) -> None:
-        self.db.execute(
-            select(Semester.id).where(Semester.id == semester_id).with_for_update()
-        )
+        self.db.execute(select(Semester.id).where(Semester.id == semester_id).with_for_update())
 
     def list_students_for_update(self, student_id: int | None = None) -> list[Student]:
         stmt = select(Student).options(lazyload(Student.user)).order_by(Student.id)
@@ -60,12 +58,9 @@ class TuitionRepository(BaseRepository):
     def list_discounts(
         self, semester_id: int | None = None, student_id: int | None = None
     ) -> list[TuitionDiscount]:
-        stmt = (
-            select(TuitionDiscount)
-            .options(
-                joinedload(TuitionDiscount.student).joinedload(Student.user),
-                joinedload(TuitionDiscount.semester),
-            )
+        stmt = select(TuitionDiscount).options(
+            joinedload(TuitionDiscount.student).joinedload(Student.user),
+            joinedload(TuitionDiscount.semester),
         )
         if semester_id is not None:
             stmt = stmt.where(TuitionDiscount.semester_id == semester_id)
@@ -150,9 +145,7 @@ class TuitionRepository(BaseRepository):
         )
         return self.db.scalar(stmt) is not None
 
-    def mark_invoices_stale(
-        self, semester_id: int, student_id: int | None = None
-    ) -> None:
+    def mark_invoices_stale(self, semester_id: int, student_id: int | None = None) -> None:
         stmt = select(TuitionInvoice).where(TuitionInvoice.semester_id == semester_id)
         if student_id is not None:
             stmt = stmt.where(TuitionInvoice.student_id == student_id)
@@ -377,11 +370,7 @@ class TuitionRepository(BaseRepository):
 
     def next_receipt_number(self, semester_id: int, semester_code: str) -> str:
         """Sinh số biên lai tuần tự có khóa dòng chống race condition (BL-<kỳ>-<6 số>)."""
-        self.db.execute(
-            select(Semester.id)
-            .where(Semester.id == semester_id)
-            .with_for_update()
-        )
+        self.db.execute(select(Semester.id).where(Semester.id == semester_id).with_for_update())
         seq = self.db.scalars(
             select(ReceiptSequence)
             .where(ReceiptSequence.semester_id == semester_id)

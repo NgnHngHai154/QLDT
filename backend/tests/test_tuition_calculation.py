@@ -14,15 +14,9 @@ from app.service.tuition.vietnamese_words import number_to_vietnamese_words
 
 def test_number_to_vietnamese_words():
     assert number_to_vietnamese_words(0) == "Không đồng"
-    assert (
-        number_to_vietnamese_words(12345000)
-        == "Mười hai triệu ba trăm bốn mươi lăm nghìn đồng"
-    )
+    assert number_to_vietnamese_words(12345000) == "Mười hai triệu ba trăm bốn mươi lăm nghìn đồng"
     assert number_to_vietnamese_words(15000000) == "Mười lăm triệu đồng"
-    assert (
-        number_to_vietnamese_words(1005000)
-        == "Một triệu không trăm lẻ năm nghìn đồng"
-    )
+    assert number_to_vietnamese_words(1005000) == "Một triệu không trăm lẻ năm nghìn đồng"
     assert number_to_vietnamese_words(21000) == "Hai mươi mốt nghìn đồng"
     assert number_to_vietnamese_words(100000000) == "Một trăm triệu đồng"
 
@@ -41,7 +35,9 @@ def test_calculate_subject_tuition_decimal_and_rounding():
 def test_calculate_discount_order_and_bounds():
     total = 10000000  # 10 triệu
     # Giảm 30% và cố định 1 triệu -> Giảm 3tr + 1tr = 4tr; Cần nộp 6tr
-    discount, due = calculate_discount(total, discount_percent=Decimal("30.00"), fixed_amount=1000000)
+    discount, due = calculate_discount(
+        total, discount_percent=Decimal("30.00"), fixed_amount=1000000
+    )
     assert discount == 4000000
     assert due == 6000000
 
@@ -123,6 +119,4 @@ def test_resolve_tuition_rate_priority():
     assert resolve_tuition_rate(rates, "K67", "CNTT").price == 520000
     # Khớp bản ghi chung khi cả 2 không có bản ghi cụ thể
     assert resolve_tuition_rate(rates, "K67", "Dien").price == 450000
-    assert (
-        resolve_tuition_rate(rates, "K66", "CNTT", date(2026, 7, 1)).price == 450000
-    )
+    assert resolve_tuition_rate(rates, "K66", "CNTT", date(2026, 7, 1)).price == 450000

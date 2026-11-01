@@ -93,9 +93,7 @@ def list_tuition_rates(
     response_model=TuitionRateResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_tuition_rate(
-    request: TuitionRateCreateRequest, _admin: AdminUser, db: DbSession
-):
+def create_tuition_rate(request: TuitionRateCreateRequest, _admin: AdminUser, db: DbSession):
     return TuitionService(db).create_rate(request)
 
 
@@ -119,9 +117,7 @@ def list_tuition_discounts(
     semester_id: Annotated[int | None, Query(alias="semesterId", ge=1)] = None,
     student_id: Annotated[int | None, Query(alias="studentId", ge=1)] = None,
 ):
-    return ItemList(
-        items=TuitionService(db).list_discounts(semester_id, student_id)
-    )
+    return ItemList(items=TuitionService(db).list_discounts(semester_id, student_id))
 
 
 @admin_router.post(
@@ -129,9 +125,7 @@ def list_tuition_discounts(
     response_model=TuitionDiscountResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_tuition_discount(
-    request: TuitionDiscountCreateRequest, admin: AdminUser, db: DbSession
-):
+def create_tuition_discount(request: TuitionDiscountCreateRequest, admin: AdminUser, db: DbSession):
     return TuitionService(db).create_discount(request, admin.full_name)
 
 
@@ -150,21 +144,15 @@ def list_tuition_installments(
     return ItemList(items=TuitionService(db).list_installments(semester_id))
 
 
-@admin_router.put(
-    "/tuition/installments", response_model=ItemList[TuitionInstallmentResponse]
-)
+@admin_router.put("/tuition/installments", response_model=ItemList[TuitionInstallmentResponse])
 def configure_tuition_installments(
     request: TuitionInstallmentsPutRequest, _admin: AdminUser, db: DbSession
 ):
     return ItemList(items=TuitionService(db).configure_installments(request))
 
 
-@admin_router.post(
-    "/tuition/invoices/generate", response_model=InvoiceGenerateResult
-)
-def generate_tuition_invoices(
-    request: InvoiceGenerateRequest, _admin: AdminUser, db: DbSession
-):
+@admin_router.post("/tuition/invoices/generate", response_model=InvoiceGenerateResult)
+def generate_tuition_invoices(request: InvoiceGenerateRequest, _admin: AdminUser, db: DbSession):
     return TuitionService(db).generate_invoices(request)
 
 
@@ -177,9 +165,7 @@ def list_tuition_invoices(
     invoice_status: Annotated[InvoiceStatus | None, Query(alias="status")] = None,
     student_code: Annotated[str | None, Query(alias="studentCode")] = None,
 ):
-    return TuitionService(db).list_admin_invoices(
-        semester_id, invoice_status, student_code, paging
-    )
+    return TuitionService(db).list_admin_invoices(semester_id, invoice_status, student_code, paging)
 
 
 @admin_router.get("/tuition/reports/summary", response_model=TuitionSummaryDto)
